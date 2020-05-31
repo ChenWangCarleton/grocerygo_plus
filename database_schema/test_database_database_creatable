@@ -1,0 +1,33 @@
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `test_tb_0` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(70) NOT NULL,
+  `gender` tinyint NOT NULL,
+  `description` text,
+  `phone` varchar(45) DEFAULT NULL,
+  `statue` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `test_tb_1` (
+  `id` int NOT NULL,
+  `second_id` int NOT NULL,
+  `title` varchar(70) NOT NULL,
+  PRIMARY KEY (`id`,`second_id`),
+  CONSTRAINT `test_tb_1_ibfk_1` FOREIGN KEY (`id`) REFERENCES `test_tb_0` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `test_tb_2` (
+  `id` int NOT NULL,
+  `time` timestamp NOT NULL,
+  `time_null` timestamp NULL DEFAULT NULL,
+  `description` text NOT NULL,
+  `description_null` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;

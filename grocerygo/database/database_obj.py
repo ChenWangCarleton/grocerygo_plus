@@ -19,7 +19,7 @@ class DatabaseObj:
         self.databasename = databasename
         self.write_access = write_access
         try:
-            self.mydb = mysql.connector.connect(host=hostname, user=username, password=password,database=databasename)
+            self.mydb = mysql.connector.connect(host=hostname, user=username, password=password,database=databasename,autocommit=True)
 
             logger.debug('class created for host:{} user:{}  to database:{}'.format(hostname,username,
                                                                                                databasename))
@@ -83,6 +83,9 @@ class DatabaseObj:
         return self.insert_update(sql_statement,kwargs['attributes'])
 
     def insert_update(self, sql_statement, values):
+        if not self.write_access:
+            logger.debug('User: {} does not have write access to execute command:\n{}\nvalues:{}\n{}'.format(self.username,sql_statement,values,traceback.format_exc()))
+            return False
         try:
             cursor = self.mydb.cursor()
             cursor.executemany(sql_statement, values)
@@ -98,6 +101,9 @@ class DatabaseObj:
 
 
     def execute_row_affected(self, sql_statement):
+        if not self.write_access:
+            logger.debug('User: {} does not have write access to execute command:\n{}\n{}'.format(self.username,sql_statement,traceback.format_exc()))
+            return False
         try:
             cursor = self.mydb.cursor()
             cursor.execute(sql_statement)

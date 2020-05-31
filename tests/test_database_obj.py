@@ -7,7 +7,7 @@ from grocerygo_plus.grocerygo.database import DatabaseObj
 class Testdatabase_obj:
 
     def setup_class(self):
-        self.data = DatabaseObj("localhost", "dev", "dev", write_access=True)
+        self.data = DatabaseObj("localhost", "test", "test",databasename='test_database' ,write_access=True)
     def test_execute_insert(self):
         
         ts = time.time()
@@ -74,3 +74,43 @@ class Testdatabase_obj:
                 flag = True
         assert flag
 
+
+    def test_read_access_account(self):
+        read = DatabaseObj("localhost", "test_read", "test",databasename='test_database' )
+        ts = time.time()
+        timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+
+        description = str(int(ts) % 86400) + str(int(ts / 86400) % 365)
+        id = description# str(int(ts / 86400) % 365) + str(int(ts) % 86400) # avoiding conflict with other test
+        assert not read.execute_insert('test_tb_2',
+                                        columnnames=['id', 'time', 'time_null', 'description', 'description_null'],
+                                        attributes=[(id, timestamp, None, 'test_execute_insert', None)])
+        assert not read.execute_update('test_tb_2', 'id = {}'.format(id),
+                        columnnames=['description_null'],
+                        attributes=[(str(ts),)])
+        assert not read.insert_update('INSERT INTO test_tb_0 (title, gender, description, phone, statue) VALUES (%s,%s,%s,%s,%s)',[('test23', '1', 'test_insert_update', '87123212', '1')])
+        assert not read.execute_row_affected("INSERT INTO test_tb_0 (title, gender, description, phone, statue) VALUES ('test23','1','test_execute_row_affected','87123212','1')")
+        assert not read.execute_delete('test_tb_0', "description='test_execute_delete'")
+
+        self.data.execute_insert('test_tb_0', columnnames=['title', 'gender', 'description', 'phone', 'statue'],
+                                 attributes=[('test', '1', 'test_read_access_account', '874562', '1')])
+        assert len(
+            read.select_from_table('test_tb_0', where_constraint="description='test_read_access_account'")) > 0
+
+        self.data.execute_insert('test_tb_0', columnnames=['title','gender','description','phone','statue'],attributes=[('test','1','test_read_access_account','874562','1')])
+        self.data.execute_update('test_tb_0', 'id = 1',
+                     columnnames=['description'],
+                     attributes=[(description,)])
+        self.data.execute_insert('test_tb_1', columnnames=['id','second_id','title'],attributes=[('1',id,'test_read_access_account')])
+
+        result = read.execute_select('SELECT test_tb_0.description, test_tb_1.second_id, test_tb_1.title FROM test_tb_0 INNER JOIN test_tb_1 ON test_tb_0.id = test_tb_1.id')
+        print(result)
+        print((description, id, 'test_read_access_account'))
+        flag = False
+        for record in result:
+            if str(record[0]) == description and str(record[1]) == id and record[2] == 'test_read_access_account':
+                # beware of the auto type conversion https://dev.mysql.com/doc/refman/5.7/en/type-conversion.html
+                # https://stackoverflow.com/questions/21762075/mysql-automatically-cast-convert-a-string-to-a-number
+                # (description, id, 'test_read_access_account')
+                flag = True
+        assert flag
