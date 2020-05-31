@@ -47,7 +47,7 @@ class DatabaseObj:
             for i in kwargs['attributes']:
                 assert len(i) == len(kwargs['attributes'][0])
         except:
-            logger.error('error when executing insert statement\nkwargs:\n{}\n'.format(kwargs))
+            logger.error('error when executing insert statement\nkwargs:\n{}\n{}'.format(kwargs,traceback.format_exc()))
             return False
         column_num = len(kwargs['columnnames'])
         sql_statement = 'INSERT INTO {} ({}) VALUES ({})'.format(table_name,
@@ -71,7 +71,7 @@ class DatabaseObj:
 
             assert where_constraint
         except:
-            logger.error('error when executing insert statement\nkwargs:\n{}\n'.format(kwargs))
+            logger.error('error when executing update statement\nkwargs:\n{}\n{}'.format(kwargs,traceback.format_exc()))
             return False
         if not where_constraint.lower().startswith('where'):
             where_constraint = 'WHERE ' + where_constraint
@@ -93,7 +93,7 @@ class DatabaseObj:
             cursor.close()
             return row_affected
         except:
-            logger.debug('Failed when executing command:\n{}'.format(sql_statement))
+            logger.debug('Failed when executing command:\n{}\n{}'.format(sql_statement,traceback.format_exc()))
             return False
 
 
@@ -108,7 +108,7 @@ class DatabaseObj:
             cursor.close()
             return row_affected
         except:
-            logger.debug('Failed when executing command:\n{}'.format(sql_statement))
+            logger.debug('Failed when executing command:\n{}\n{}'.format(sql_statement,traceback.format_exc()))
             return False
 
     def select_from_table(self, table_name, where_constraint='', *column_names):
@@ -129,7 +129,7 @@ class DatabaseObj:
         try:
             assert where_constraint
         except:
-            logger.error('error when executing delete statement on table {}'.format(table_name))
+            logger.error('error when executing delete statement on table {}\n{}'.format(table_name,traceback.format_exc()))
             return False
         if not where_constraint.lower().startswith('where'):
             where_constraint = 'WHERE ' + where_constraint
@@ -147,5 +147,5 @@ class DatabaseObj:
             logger.debug('select command:\n{}\nexecuted successfully'.format(sql_statement))
             return result
         except:
-            logger.debug('Failed when executing select command:\n{}'.format(sql_statement))
+            logger.debug('Failed when executing select command:\n{}\n{}'.format(sql_statement,traceback.format_exc()))
             return False

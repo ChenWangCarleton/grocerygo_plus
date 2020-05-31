@@ -1,6 +1,4 @@
-from grocerygo_plus.database import DatabaseObj
-import time
-import datetime
+from grocerygo_plus.grocerygo.database import DatabaseObj
 
 if __name__ == '__main__':
     data=DatabaseObj("localhost","dev","dev",write_access=True)
