@@ -1,9 +1,6 @@
 import time
 import datetime
-import pytest
-import logging
 
-LOGGER = logging.getLogger(__name__)
 from grocerygo_plus.grocerygo.database import DatabaseObj
 
 
