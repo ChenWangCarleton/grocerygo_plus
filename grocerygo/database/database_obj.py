@@ -93,14 +93,14 @@ class DatabaseObj:
             cursor.close()
             return row_affected
         except:
-            logger.debug('Failed when executing command:\n{}\n{}'.format(sql_statement,traceback.format_exc()))
+            logger.debug('Failed when executing command:\n{}\nvalues:{}\n{}'.format(sql_statement,values,traceback.format_exc()))
             return False
 
 
     def execute_row_affected(self, sql_statement):
         try:
             cursor = self.mydb.cursor()
-            cursor.executemany(sql_statement)
+            cursor.execute(sql_statement)
             self.mydb.commit()
             row_affected = cursor.rowcount
             #print(row_affected, "was inserted.")
@@ -129,7 +129,7 @@ class DatabaseObj:
         try:
             assert where_constraint
         except:
-            logger.error('error when executing delete statement on table {}\n{}'.format(table_name,traceback.format_exc()))
+            logger.error('error when executing delete statement on table {}\nwith where constraint: {}\n{}'.format(table_name, where_constraint,traceback.format_exc()))
             return False
         if not where_constraint.lower().startswith('where'):
             where_constraint = 'WHERE ' + where_constraint
