@@ -1,0 +1,7 @@
+first loop through every department to get link to each items
+then get description/ingridents blah blah blah without selecting stores
+
+to get price for each stores as well as check if item avaiable in each store,
+first go to loblaws get store locations,
+then use the SAME driver instance with links to item
+if the item is not available in that store, it will be redirected to the main page. see test.py for example
