@@ -43,9 +43,11 @@ CREATE TABLE `item_price` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `item_url` (
   `item_id` int NOT NULL AUTO_INCREMENT,
-  `url` varchar(2083) NOT NULL,
+  `url` varchar(765) NOT NULL,
   `source_brand` varchar(70) NOT NULL,
-  PRIMARY KEY (`item_id`)
+  `category` varchar(70) NOT NULL,
+  PRIMARY KEY (`item_id`),
+  UNIQUE KEY `url` (`url`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -76,7 +78,7 @@ CREATE TABLE `test_tb_0` (
   `phone` varchar(45) DEFAULT NULL,
   `statue` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
