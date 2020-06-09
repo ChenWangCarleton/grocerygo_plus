@@ -65,7 +65,7 @@ CREATE TABLE `tag` (
   `tag_name` varchar(70) NOT NULL,
   `item_id` int NOT NULL,
   PRIMARY KEY (`item_id`,`tag_name`),
-  CONSTRAINT `tag_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`)
+  CONSTRAINT `tag_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item_url` (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
