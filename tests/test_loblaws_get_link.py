@@ -1,9 +1,10 @@
-from grocerygo_plus.grocerygo.web_crawler import has_more_subcategories, load_more
+from grocerygo_plus.grocerygo.web_crawler import has_more_subcategories, load_more, get_link
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 
-
 import os
+
+
 def test_has_more_subcategories():
     food = 'https://www.loblaws.ca/Food/c/LSL001000000000?navid=flyout-L2-Food'
     apple = 'https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Fruit/Apples/plp/LSL001001001001?navid=CLP-L5-Apples'
@@ -29,3 +30,11 @@ def test_load_more():
     assert load_more(driver) == 3
     driver.get(apple)
     assert load_more(driver) == 0
+
+
+def test_get_link():
+    fruit = 'https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Fruit/c/LSL001001001000?navid=CLP-L4-Fruit'
+    apple = 'https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Fruit/Apples/plp/LSL001001001001?navid=CLP-L5-Apples'
+    assert len(get_link((apple,['test']))[0]) > 10
+    assert len(get_link((fruit,['test']),headless=True,disableimage=True)[0]) > 100
+    assert get_link((apple,['test']),headless=True,disableimage=True)[1][0] =='test'

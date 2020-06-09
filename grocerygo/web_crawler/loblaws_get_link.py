@@ -26,6 +26,66 @@ web_driver_loc = os.path.join(os.path.abspath(os.path.dirname(__file__)),'chrome
 max_running_thread = 10
 waiting_list = [] # a list contains thread to be executed to get item links of each leaf categories
 
+
+def get_link(url_category_tuple,headless=False,disableimage=False):
+    """
+    This function creates a driver using the url from the first element in the parameter url_category_tuple and
+    gets all the listed items' item-page-url
+
+    :param url_category_tuple: a 2-element-tuple that
+        the first element is the url of the webpage,
+        it should be one of the webpage under food category from loblaws.
+        the second element is the category list, which is a list of strings
+
+    :param headless: boolen for representing whether it runs in headless mode
+    :param disableimage: boolen for representing whether it runs in image-less mode
+    :return: a 2-element tuple which the first element is a list of urls,
+        the second element is the category list from the second element in the parameter url_category_tuple
+        boolean False when error happened
+    """
+    url = url_category_tuple[0]
+    options = Options()
+    if headless:
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')  # Last I checked this was necessary.
+        options.add_argument("window-size=1920,1080")
+    if disableimage:
+        options.add_argument('--blink-settings=imagesEnabled=false')
+
+    driver = webdriver.Chrome(web_driver_loc, options=options)
+    driver.get(url)
+
+    result = load_more(driver)
+
+    logger.debug('load more button clicked total {} times for url:\n{}'.format(result,url))
+
+    try:
+        current_pagination = driver.find_element_by_class_name('pagination').text
+        total_item_listed = int(current_pagination[2:].split(' ')[0])
+        item_elements = driver.find_elements_by_class_name('product-tile__details__info__name__link')
+
+        if len(item_elements) != total_item_listed:
+            # do it again if it does not match :)
+            time.sleep(1)
+            item_elements = driver.find_elements_by_class_name('product-tile__details__info__name__link')
+            if len(item_elements) != total_item_listed:
+                logger.error('total number of item showing in pagination does not match with items found in page'
+                             ' when getting itempage urls for url:\n{}\n{}'.format(url, traceback.format_exc()))
+                return False
+
+        url_list = []
+        for element in item_elements:
+            itempage_url = element.get_attribute('href')
+            url_list.append(itempage_url)
+        logger.info("all itempages' link collected in url\n{}".format(url))
+        return (url_list,url_category_tuple[1])
+
+    except:
+        logger.error('error when getting itempage urls for url:\n{}\n{}'.format(url,traceback.format_exc()))
+        return False
+
+
+
 def load_more(driver):
     """
     This function loads all the "load xxx more results" on the page untill all the items are loaded
@@ -68,18 +128,31 @@ def load_more(driver):
         current_pagination = driver.find_element_by_class_name('pagination').text
         click_counter = click_counter + 1
     return click_counter
-def has_more_subcategories(url_category_tuple,headless=False,disableimage=False): #
+
+
+def has_more_subcategories(url_category_tuple,headless=False,disableimage=False):
     """
     This function checks if there are more subcategories in the url.
+
     If there is any, it returns the list of 2 element tuple. The first element in the tuple is the url,
     the second element in the tuple is a list of all category
-    If not, it returns string which is the current category
-    :param url: the url of the webpage, it should be one of the webpage under food category from loblaws
+
+    If not, it returns string which is the current category, the function caller should
+    then add the current category to category list
+
+    :param url_category_tuple: a 2-element-tuple that
+        the first element is the url of the webpage,
+        it should be one of the webpage under food category from loblaws.
+        the second element is the category list, which is a list of strings
+
+    :param headless: boolen for representing whether it runs in headless mode
+    :param disableimage: boolen for representing whether it runs in image-less mode
     :return:
         list
             a list of 2-element-tuple of url as first value , list of categories as second value, the current category is appended to the end of the list of categories
         string
             string of the current category if there is no more subcategories
+        boolean False when error happened
     """
     url = url_category_tuple[0]
     options = Options()
@@ -116,7 +189,8 @@ def has_more_subcategories(url_category_tuple,headless=False,disableimage=False)
         return result_list
     else:
         logger.error('unexpected situation, num of li element is smaller than 0 for url \n{}\n the website code might have changed'.format(url))
-    print(len(li_elements))
+        return False
+
 if __name__ == '__main__':
     food = 'https://www.loblaws.ca/Food/c/LSL001000000000?navid=flyout-L2-Food'
     freshfromscratch = 'https://www.loblaws.ca/Food/Meal-Kits/By-Serving-Time/Fresh-from-Scratch-(15-Min%2B)/plp/LSL001002009003?navid=CLP-L5-Fresh-from-Scratch-15-Min'
@@ -124,10 +198,13 @@ if __name__ == '__main__':
     apple = 'https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Fruit/Apples/plp/LSL001001001001?navid=CLP-L5-Apples'
     #print(has_more_subcategories((apple,[])))
 
-    options = Options()
+    """options = Options()
     options.add_argument('--blink-settings=imagesEnabled=false')
     driver = webdriver.Chrome(web_driver_loc, options=options)
     driver.get(fruit)
     print(load_more(driver))
     driver.get(apple)
-    print(load_more(driver))
+    print(load_more(driver))"""
+
+    """print(len(get_link((apple,['test']),headless=True,disableimage=True)[0]))
+    print(len(get_link((fruit,['test']))[0]))"""
