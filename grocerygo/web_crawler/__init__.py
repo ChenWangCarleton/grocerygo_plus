@@ -1,1 +1,1 @@
-from .test import *
+from .loblaws_get_link import *
