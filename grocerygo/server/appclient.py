@@ -3,13 +3,19 @@ import socket
 import selectors
 import traceback
 
-from grocerygo_plus.grocerygo.server import libclient
+import libclient
 
 sel = selectors.DefaultSelector()
 
 
 def create_request(action, value):
     if action == "search":
+        return dict(
+            type="text/json",
+            encoding="utf-8",
+            content=dict(action=action, value=value),
+        )
+    elif action == "server":
         return dict(
             type="text/json",
             encoding="utf-8",
@@ -34,12 +40,13 @@ def start_connection(host, port, request):
     sel.register(sock, events, data=message)
 
 
-if len(sys.argv) != 5:
-    print("usage:", sys.argv[0], "<host> <port> <action> <value>")
+if len(sys.argv) != 3:
+    print("usage:", sys.argv[0], "<action> <value>")
     sys.exit(1)
 
-host, port = sys.argv[1], int(sys.argv[2])
-action, value = sys.argv[3], sys.argv[4]
+host='localhost'
+port = 65432
+action, value = sys.argv[1], sys.argv[2]
 request = create_request(action, value)
 start_connection(host, port, request)
 

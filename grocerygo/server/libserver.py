@@ -4,13 +4,22 @@ import json
 import io
 import struct
 
+from server_loblaws import *
+
 request_search = {
     "morpheus": "Follow the white rabbit. \U0001f430",
     "ring": "In the caves beneath the Misty Mountains. \U0001f48d",
     "\U0001f436": "\U0001f43e Playing ball! \U0001f3d0",
 }
-
-
+loblaws_server = Server_Loblaws()
+loblaws_server_dict = {
+    "status": loblaws_server.get_server_status,
+    "initial": loblaws_server.initial_get_loblaws_item_links,
+    "quit": loblaws_server.send_quit,
+    "result": loblaws_server.return_get_link_result_list,
+    "failed": loblaws_server.return_get_link_failed_list,
+    'reset': loblaws_server.force_reset,
+}
 class Message:
     def __init__(self, selector, sock, addr):
         self.selector = selector
@@ -90,9 +99,14 @@ class Message:
 
     def _create_response_json_content(self):
         action = self.request.get("action")
+        print('action:',action)
         if action == "search":
             query = self.request.get("value")
             answer = request_search.get(query) or f'No match for "{query}".'
+            content = {"result": answer}
+        elif action == "server":
+            query = self.request.get("value")
+            answer = loblaws_server_dict.get(query)() or f'No match for "{query}".'
             content = {"result": answer}
         else:
             content = {"result": f'Error: invalid action "{action}".'}

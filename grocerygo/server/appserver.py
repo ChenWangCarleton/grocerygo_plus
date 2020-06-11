@@ -3,7 +3,7 @@ import socket
 import selectors
 import traceback
 
-from grocerygo_plus.grocerygo.server import libserver
+import libserver
 
 sel = selectors.DefaultSelector()
 
@@ -16,11 +16,10 @@ def accept_wrapper(sock):
     sel.register(conn, selectors.EVENT_READ, data=message)
 
 
-if len(sys.argv) != 3:
-    print("usage:", sys.argv[0], "<host> <port>")
-    sys.exit(1)
 
-host, port = sys.argv[1], int(sys.argv[2])
+
+host='localhost'
+port = 65432
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Avoid bind() exception: OSError: [Errno 48] Address already in use
 lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
