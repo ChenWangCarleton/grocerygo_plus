@@ -34,21 +34,27 @@ class Server_Loblaws():
         self.monitor = threading.Thread(target=self.monitor_thread)
         self.monitor.start()
 
+        self.quit_server = False
+
         self.result_list = []
         self.failed_list = []
     def __del__(self):
         logger.debug('Deleting Server_Loblaws instance')
+        self.get_server_status()
+
+    def get_server_status(self):
+        print('current get_link_loblaws_tuple_queue size is {}'.format(self.get_link_loblaws_tuple_queue.qsize()))
+        print('current running thread {}'.format(self.current_running_thread))
+
         total_item_link = 0
         print('printing item in result list')
         for urls in self.result_list:
             print(urls)
-            total_item_link += len(urls)
+            total_item_link += len(urls[0])
         print('\n\nprinting item in failed list')
         for i in self.failed_list:
             print(i)
         print('total {} elements in result list and {} elements in failed list'.format(total_item_link, len(self.failed_list)))
-    def get_server_status(self):
-        print('current get_link_loblaws_tuple_queue size is {}'.format(self.get_link_loblaws_tuple_queue.qsize()))
 
 
     def initial_get_loblaws_item_links(self):
@@ -103,7 +109,8 @@ class Server_Loblaws():
                 category_list = url_category_tuple[1]
                 category_list.append(result)
                 link_tuples = get_link((url_category_tuple[0], category_list), headless=True, disableimage=True)
-                self.result_list.append(link_tuples[0]) # only appending the url list
+                #self.result_list.append(link_tuples[0]) # only appending the url list
+                self.result_list.append(link_tuples)  # only appending the url list
                 # TODO insert the result urls-categories tuples to database
                 # TODO add interactive mode to server (another thread that monitors input)
             logger.debug('successfully executed get_loblaws_item_links with input tuple \n{}\n'
