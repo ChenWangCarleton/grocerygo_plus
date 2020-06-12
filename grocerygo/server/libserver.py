@@ -19,6 +19,8 @@ loblaws_server_dict = {
     "result": loblaws_server.return_get_link_result_list,
     "failed": loblaws_server.return_get_link_failed_list,
     'reset': loblaws_server.force_reset,
+    'write': loblaws_server.start_writting,
+    'retry': loblaws_server.retry_first_max_failed_get_link_list,
 }
 class Message:
     def __init__(self, selector, sock, addr):

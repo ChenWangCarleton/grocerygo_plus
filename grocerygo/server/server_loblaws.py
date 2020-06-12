@@ -32,6 +32,7 @@ class Server_Loblaws():
         self.data = DatabaseObj("localhost", "readwrite", "readwrite", databasename='grocerygo', write_access=True)
 
         self.getting_links = False
+        self.writting_links_to_db = False
         self.quit_server = False
         self.get_link_result_list = []
         self.get_link_failed_list = []
@@ -39,6 +40,29 @@ class Server_Loblaws():
         self.monitor = threading.Thread(target=self.monitor_thread)
         self.monitor.start()
 
+
+    def write_link_to_db(self, brand='Loblaws'):
+        while len(self.get_link_result_list) > 0:
+
+            current_result = self.get_link_result_list[0]  # will not remove from list untill it is written into db
+            category = current_result[1][1]
+            urls = current_result[0]
+
+            attribute_tuple_list = []
+            for url in urls:
+                attribute_tuple_list.append((url, brand, category))
+
+            respond = self.data.execute_insert('item_url',
+                                               columnnames=['url', 'source_brand', 'category'],
+                                               attributes=attribute_tuple_list)
+            if not respond:
+                logger.error('error when writting into database, terminating the writing process now, '
+                             'please try again once the database issue is fixed')
+                self.writting_links_to_db = False
+                return False
+            self.get_link_result_list.pop(0)
+        self.writting_links_to_db = False
+        return True
 
     def force_reset(self):
         logger.info('force reseting Server_Loblaws instance')
@@ -59,7 +83,19 @@ class Server_Loblaws():
         logger.debug('Deleting Server_Loblaws instance')
         self.get_server_status()
 
-
+    def start_writting(self, iswritting=True):
+        if self.getting_links:
+            logger.info('Server is getting itempages links, please check back latter')
+            return False
+        elif len(self.get_link_result_list) == 0:
+            logger.info('No link to be wrote into database')
+            return False
+        elif self.writting_links_to_db:
+            logger.info('Server is writting links into database, please check back latter')
+            return False
+        self.writting_links_to_db = iswritting
+        threading.Thread(target=self.write_link_to_db).start()
+        return True
     def send_quit(self, isquiting=True):
         if isinstance(isquiting, bool):
             self.quit_server = isquiting
@@ -93,7 +129,10 @@ class Server_Loblaws():
         return result_str
 
     def initial_get_loblaws_item_links(self):
-        if not self.get_link_loblaws_tuple_queue.empty() or self.current_running_thread !=0:
+        if self.writting_links_to_db:
+            logger.error('trying to getting links when the server is writting links into db, please try again later')
+            return False
+        elif not self.get_link_loblaws_tuple_queue.empty() or self.current_running_thread !=0:
             logger.error('trying to execute get_loblaws_item_links when queue get_link_loblaws_tuple_queue is not '
                          'empty, currently {} tasks in queue, currently {} running thread'.format(
                 self.get_link_loblaws_tuple_queue.qsize(), self.current_running_thread))
@@ -129,11 +168,29 @@ class Server_Loblaws():
                     self.getting_links = True
             if self.get_link_loblaws_tuple_queue.empty() and self.current_running_thread == 0 and self.getting_links:
                 self.getting_links = False
-
             if self.quit_server:
                 logger.info('ending server_loblaws monitor thread')
                 break
 
+
+    def retry_first_max_failed_get_link_list(self):
+        if not self.getting_links:
+            self.getting_links = True
+            threads_to_start = min(self.max_running_thread, len(self.get_link_failed_list))
+            retry_list = self.get_link_failed_list[:threads_to_start]
+            self.get_link_failed_list = self.get_link_failed_list[threads_to_start:]
+            for url_category_tuple in retry_list:
+                with self.current_running_thread_lock:
+                    self.current_running_thread += 1
+                threading.Thread(target=self.get_loblaws_item_links,
+                                 args=(url_category_tuple,)).start()
+                logger.debug('started a new thread for get_loblaws_item_links, current {} running thread'
+                             .format(self.current_running_thread))
+            logger.debug('retrying first {} failed list'.format(threads_to_start))
+            return True
+        else:
+            logger.debug('server is getting links, please try again later')
+            return False
 
 
     def get_loblaws_item_links(self, url_category_tuple):

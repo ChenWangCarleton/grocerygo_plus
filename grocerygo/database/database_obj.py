@@ -95,6 +95,9 @@ class DatabaseObj:
             logger.info('succeeded when executing command:\n{}'.format(sql_statement))
             cursor.close()
             return row_affected
+        except mysql.connector.IntegrityError as err:
+            logger.debug('mysql IntegrityError:{}\nwhen executing insert_update with values\n{}'.format(err, values))
+            return True
         except:
             logger.debug('Failed when executing command:\n{}\nvalues:{}\n{}'.format(sql_statement,values,traceback.format_exc()))
             return False
