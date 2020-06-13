@@ -61,9 +61,12 @@ class Server_Loblaws():
 
 
     def get_id_url(self,category, brand='Loblaws'):
-        result = self.data.select_from_table('item_url', "source_brand='Loblaws' and category='{}'".format(category), 'item_id', 'url')
+        # get list of (item_id, url) tuple from database
+        result = self.data.select_from_table('item_url', "source_brand='{}' and category='{}'".format(brand, category), 'item_id', 'url')
         #print(result)
-        return len(result)
+        return result
+
+
     def write_link_to_db(self, brand='Loblaws'):
         while len(self.get_link_result_list) > 0:
 
