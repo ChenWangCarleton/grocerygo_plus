@@ -48,6 +48,7 @@ class Testdatabase_obj:
         
         self.data.execute_insert('test_tb_0', columnnames=['title','gender','description','phone','statue'],attributes=[('test','1','test_select_from_table','874562','1')])
         assert len(self.data.select_from_table('test_tb_0', "description='test_select_from_table'"))>0
+        assert len(self.data.select_from_table('test_tb_0', "description='This should not exist'"))==0
 
     def test_execute_delete(self):
         

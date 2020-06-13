@@ -14,13 +14,18 @@ request_search = {
 loblaws_server = Server_Loblaws()
 loblaws_server_dict = {
     "status": loblaws_server.get_server_status,
-    "initial": loblaws_server.initial_get_loblaws_item_links,
-    "quit": loblaws_server.send_quit,
-    "result": loblaws_server.return_get_link_result_list,
-    "failed": loblaws_server.return_get_link_failed_list,
     'reset': loblaws_server.force_reset,
-    'write': loblaws_server.start_writting,
-    'retry': loblaws_server.retry_first_max_failed_get_link_list,
+    "quit": loblaws_server.send_quit,
+    "initial_link": loblaws_server.initial_get_loblaws_item_links,
+    "result_link": loblaws_server.return_get_link_result_list,
+    "failed_link": loblaws_server.return_get_link_failed_list,
+    'write_link': loblaws_server.start_writting_links,
+    'retry_link': loblaws_server.retry_first_max_failed_get_link_list,
+    "initial_price": loblaws_server.initial_get_loblaws_item_price,
+    "result_price": loblaws_server.return_get_price_result_list,
+    "failed_price": loblaws_server.return_get_price_failed_list,
+    'write_price': loblaws_server.start_writting_price,
+    'retry_price': loblaws_server.retry_first_max_failed_get_price_list,
 }
 class Message:
     def __init__(self, selector, sock, addr):
