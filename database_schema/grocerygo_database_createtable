@@ -16,7 +16,7 @@ CREATE TABLE `grocery_list` (
 CREATE TABLE `item` (
   `item_id` int NOT NULL,
   `name` varchar(255) NOT NULL,
-  `brand` varchar(70) NOT NULL,
+  `brand` varchar(70) DEFAULT NULL,
   `description` text,
   `ingrident` text,
   PRIMARY KEY (`item_id`),
