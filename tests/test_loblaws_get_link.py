@@ -1,4 +1,4 @@
-from grocerygo_plus.grocerygo.web_crawler import has_more_subcategories, load_more, get_link, get_link_price
+from grocerygo_plus.grocerygo.web_crawler import has_more_subcategories, load_more, get_link, get_link_price,get_item_detail
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 
@@ -49,3 +49,16 @@ def test_get_link_price():
     for result in fruit_result:
         assert '$' in result[2]
     assert get_link_price((apple, ['test']), headless=True, disableimage=True)[0][1][0] == 'test'
+
+
+def test_get_item_detail():
+    unavailable = 'https://www.loblaws.ca/Food/Ready-Made-Meals/Ready-Meals-%26-Sides/Sushi-%26-Bento/Spicy-Salmon-Roll/p/20072659_EA'
+    has_all = 'https://www.loblaws.ca/Food/Frozen/Ice-Cream-%26-Treats/Ice-Cream-Tubs-%26-Treats/Strawberry-Ice-Cream/p/20322906_EA'
+    no_des = "https://www.loblaws.ca/Food/Frozen/Vegetables/Vegetable-Bags/President's-Choice-Sliced-Red-Beets/p/21106753_EA"
+    no_b_no_ing = 'https://www.loblaws.ca/Food/Ready-Made-Meals/Ready-Meals-%26-Sides/Chicken-%26-Turkey-Meals-(hot-foods-for-pickup-after-12PM)/1-Original-Chicken-Tender/p/20077463_EA'
+    assert get_item_detail((1, unavailable), headless=True, disableimage=True) == 'unavailable'
+    assert not all(get_item_detail((1, has_all), headless=True, disableimage=True))
+    assert get_item_detail((1, no_des), headless=True, disableimage=True)[3] is None
+    result = get_item_detail((1, no_b_no_ing), headless=True, disableimage=True)
+    assert result[2] is None
+    assert result[4] is None

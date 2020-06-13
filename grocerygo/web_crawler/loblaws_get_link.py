@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 
 logger = logging.getLogger(__name__)
@@ -21,6 +21,106 @@ logger.addHandler(ch)
 
 
 web_driver_loc = os.path.join(os.path.abspath(os.path.dirname(__file__)),'chromedriver.exe')
+
+def get_item_detail(id_url_tuple, headless=False, disableimage=False):
+    """
+    This function gets the item detail from giving id_url_tuple which is a 2-element tuple that
+    the first element is the item_id, the second element is the url of the item page.
+    The function first check if the url is redirected to loblaws homepage which means the item is not available at the moment,
+    if so return string unavailable
+    If not, collect the item name, brand if exist, description if exist, ingrident list if exist
+    then return a 6-element tuple (item_id, name, brand, description, ingrident, imgsrc)
+    Return False when unexpected error happens
+    :param id_url_tuple: a 2-element tuple that
+    the first element is the item_id, the second element is the url of the item page.
+    :param headless: boolen for representing whether it runs in headless mode
+    :param disableimage: boolen for representing whether it runs in image-less mode
+    :return:
+    String unavailable when page not available
+    False when error happens
+    Tuple a 6-element tuple (item_id, name, brand, description, ingrident, imgsrc)
+    """
+    item_id = id_url_tuple[0]
+    url = id_url_tuple[1]
+    options = Options()
+    if headless:
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')  # Last I checked this was necessary.
+        options.add_argument("window-size=1920,1080")
+    if disableimage:
+        options.add_argument('--blink-settings=imagesEnabled=false')
+
+    driver = webdriver.Chrome(web_driver_loc, options=options)
+    try:
+        driver.get(url)
+        driver.implicitly_wait(1)
+        home_page = 'https://www.loblaws.ca/'
+        unavailable_msg = 'unavailable'
+        if home_page == driver.current_url:
+            logger.debug('Item page unavailable for id: {} url: \n{}'.format(item_id, url))
+            return unavailable_msg
+
+        element_present = EC.presence_of_element_located((By.CLASS_NAME, 'product-details-page-details__content__name'))
+        WebDriverWait(driver, 10).until(element_present)
+
+        current_item_element = driver.find_element_by_class_name('product-details-page-details__content__name')
+        name = current_item_element.find_element_by_css_selector('.product-name__item.product-name__item--name').text
+        brand = None
+        try:
+            selenium_input = '.product-name__item.product-name__item--brand'
+            element_present = EC.presence_of_element_located(
+                (By.CSS_SELECTOR, selenium_input))
+            WebDriverWait(driver, 2).until(element_present)
+            brand = current_item_element.find_element_by_css_selector(selenium_input).text
+        except (NoSuchElementException, TimeoutException) as e:
+            logger.debug('no brand info for id: {} url: \n{}'.format(item_id, url))
+        description = None
+        try:
+            selenium_input = 'product-description-text__text'
+            element_present = EC.presence_of_element_located(
+                (By.CLASS_NAME, selenium_input))
+            WebDriverWait(driver, 2).until(element_present)
+
+            description = driver.find_element_by_class_name(selenium_input).text
+        except (NoSuchElementException, TimeoutException) as e:
+            logger.debug('no description for id: {} url: \n{}'.format(item_id, url))
+        ingredients = None
+        try:
+            """class_name = "product-details-page-info-layout-content product-details-page-info-layout-content--i product-details-page-info-layout-content--n product-details-page-info-layout-content--g product-details-page-info-layout-content--r product-details-page-info-layout-content--e product-details-page-info-layout-content--d product-details-page-info-layout-content--i product-details-page-info-layout-content--e product-details-page-info-layout-content--n product-details-page-info-layout-content--t product-details-page-info-layout-content--s product-details-page-info-layout-content--active"
+            class_name = '.'+'.'.join(class_name.split(' '))
+            print(class_name)
+            selenium_input = class_name"""
+            selenium_input = '.product-details-page-info-layout.product-details-page-info-layout--ingredients'
+            element_present = EC.presence_of_element_located(
+                (By.CSS_SELECTOR, selenium_input))
+            WebDriverWait(driver, 2).until(element_present)
+            ingredients = driver.find_element_by_css_selector(selenium_input).find_element_by_tag_name('div').get_attribute('innerHTML')
+            # here it seems only works with innerHTML istead of text
+            #print('ingredi:',ingredients.get_attribute('innerHTML'))
+            #ingredients = driver.find_element_by_css_selector('.product-details-page-info-layout.product-details-page-info-layout--ingredients').text
+        except (NoSuchElementException, TimeoutException) as e:
+            logger.debug('no ingredients for id: {} url: \n{}'.format(item_id, url))
+        imgsrc = None
+        try:
+            selenium_input = '.product-image-list__item.product-image-list__item--product-details-page.product-image-list__item--0'
+            element_present = EC.presence_of_element_located(
+                (By.CSS_SELECTOR, selenium_input))
+            WebDriverWait(driver, 2).until(element_present)
+            image_element = driver.find_elements_by_css_selector(selenium_input)[0]
+            imgsrc = image_element.find_element_by_tag_name('img').get_attribute('src')
+            print(imgsrc)
+        except (NoSuchElementException, TimeoutException) as e:
+            logger.debug('no image src found for id: {} url: \n{}'.format(item_id, url))
+        result_tuple = (item_id,name,brand,description,ingredients, imgsrc)
+        logger.debug('item detail got for id: {} url: \n{}\nvalue:{}'.format(item_id, url,result_tuple))
+        #input('hrere')
+        return result_tuple
+
+    except:
+        logger.error('error when getting item detail for id:{}  url:\n{}\n{}'.format(item_id, url,traceback.format_exc()))
+        return False
+
+
 
 
 def get_link(url_category_tuple,headless=False,disableimage=False):
