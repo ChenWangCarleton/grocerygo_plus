@@ -28,15 +28,10 @@ CREATE TABLE `item` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `item_price` (
   `item_id` int NOT NULL,
-  `store_id` int NOT NULL,
-  `price` decimal(10,2) NOT NULL,
-  `price_unit` varchar(70) NOT NULL,
-  `update_timestamp` timestamp NOT NULL,
-  `regular_price` tinyint(1) NOT NULL,
-  PRIMARY KEY (`item_id`,`store_id`),
-  KEY `store_id` (`store_id`),
-  CONSTRAINT `item_price_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`),
-  CONSTRAINT `item_price_ibfk_2` FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
+  `daily_id` varchar(70) NOT NULL,
+  `price` varchar(255) NOT NULL,
+  PRIMARY KEY (`item_id`,`daily_id`),
+  CONSTRAINT `item_price_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item_url` (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -48,7 +43,7 @@ CREATE TABLE `item_url` (
   `category` varchar(70) NOT NULL,
   PRIMARY KEY (`item_id`),
   UNIQUE KEY `url` (`url`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=443 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
