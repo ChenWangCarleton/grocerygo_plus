@@ -34,13 +34,25 @@ class Server_Loblaws():
         self.getting_links = False
         self.writting_links_to_db = False
         self.quit_server = False
+        self.get_price = False
         self.get_link_result_list = []
         self.get_link_failed_list = []
+        self.category_list = []
 
         self.monitor = threading.Thread(target=self.monitor_thread)
         self.monitor.start()
 
+    def get_category_list(self):
+        result = self.data.select_from_table('item_url', "source_brand='Loblaws'",'distinct category')
+        for element in result:
+            self.category_list.append(element[0])
+        #print(self.category_set)
 
+
+    def get_id_url(self,category, brand='Loblaws'):
+        result = self.data.select_from_table('item_url', "source_brand='Loblaws' and category='{}'".format(category), 'item_id', 'url')
+        print(result)
+        return len(result)
     def write_link_to_db(self, brand='Loblaws'):
         while len(self.get_link_result_list) > 0:
 
@@ -217,3 +229,9 @@ class Server_Loblaws():
             with self.current_running_thread_lock:
                 self.current_running_thread -= 1
                 print('current {} element in result list'.format(len(self.get_link_result_list)))
+server = Server_Loblaws()
+server.get_category_list()
+len_list = []
+for category in server.category_list:
+    len_list.append(server.get_id_url(category))
+print(len_list)

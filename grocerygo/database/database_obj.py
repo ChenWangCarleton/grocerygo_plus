@@ -120,7 +120,7 @@ class DatabaseObj:
             logger.debug('Failed when executing command:\n{}\n{}'.format(sql_statement,traceback.format_exc()))
             return False
 
-    def select_from_table(self, table_name, where_constraint='', *column_names):
+    def select_from_table(self, table_name, where_constraint, *column_names):
         if len(column_names) == 0:
             sql_statement = "SELECT * FROM {}".format(table_name)
         else:

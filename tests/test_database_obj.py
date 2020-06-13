@@ -47,7 +47,7 @@ class Testdatabase_obj:
     def test_select_from_table(self):
         
         self.data.execute_insert('test_tb_0', columnnames=['title','gender','description','phone','statue'],attributes=[('test','1','test_select_from_table','874562','1')])
-        assert len(self.data.select_from_table('test_tb_0', where_constraint="description='test_select_from_table'"))>0
+        assert len(self.data.select_from_table('test_tb_0', "description='test_select_from_table'"))>0
 
     def test_execute_delete(self):
         
@@ -95,7 +95,7 @@ class Testdatabase_obj:
         self.data.execute_insert('test_tb_0', columnnames=['title', 'gender', 'description', 'phone', 'statue'],
                                  attributes=[('test', '1', 'test_read_access_account', '874562', '1')])
         assert len(
-            read.select_from_table('test_tb_0', where_constraint="description='test_read_access_account'")) > 0
+            read.select_from_table('test_tb_0', "description='test_read_access_account'")) > 0
 
         self.data.execute_insert('test_tb_0', columnnames=['title','gender','description','phone','statue'],attributes=[('test','1','test_read_access_account','874562','1')])
         self.data.execute_update('test_tb_0', 'id = 1',
