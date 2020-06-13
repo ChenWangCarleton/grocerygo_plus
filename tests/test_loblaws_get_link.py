@@ -1,4 +1,4 @@
-from grocerygo_plus.grocerygo.web_crawler import has_more_subcategories, load_more, get_link
+from grocerygo_plus.grocerygo.web_crawler import has_more_subcategories, load_more, get_link, get_link_price
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 
@@ -35,6 +35,17 @@ def test_load_more():
 def test_get_link():
     fruit = 'https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Fruit/c/LSL001001001000?navid=CLP-L4-Fruit'
     apple = 'https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Fruit/Apples/plp/LSL001001001001?navid=CLP-L5-Apples'
-    assert len(get_link((apple,['test']))[0]) > 10
-    assert len(get_link((fruit,['test']),headless=True,disableimage=True)[0]) > 100
-    assert get_link((apple,['test']),headless=True,disableimage=True)[1][0] =='test'
+    assert len(get_link((apple, ['test']))[0]) > 10
+    assert len(get_link((fruit, ['test']), headless=True, disableimage=True)[0]) > 100
+    assert get_link((apple, ['test']), headless=True, disableimage=True)[1][0] == 'test'
+
+
+def test_get_link_price():
+    fruit = 'https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Fruit/c/LSL001001001000?navid=CLP-L4-Fruit'
+    apple = 'https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Fruit/Apples/plp/LSL001001001001?navid=CLP-L5-Apples'
+    assert len(get_link_price((apple, ['test']))) > 10
+    fruit_result = get_link_price((fruit, ['test']), headless=True, disableimage=True)
+    assert len(fruit_result) > 100
+    for result in fruit_result:
+        assert '$' in result[2]
+    assert get_link_price((apple, ['test']), headless=True, disableimage=True)[0][1][0] == 'test'

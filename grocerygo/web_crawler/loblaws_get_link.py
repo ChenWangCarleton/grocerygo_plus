@@ -81,6 +81,77 @@ def get_link(url_category_tuple,headless=False,disableimage=False):
         return False
 
 
+def get_link_price(url_category_tuple,headless=False,disableimage=False):
+    """
+    This function creates a driver using the url from the first element in the parameter url_category_tuple and
+    gets all the listed items' item-page-url, category list and prices
+
+    :param url_category_tuple: a 2-element-tuple that
+        the first element is the url of the webpage,
+        it should be one of the webpage under food category from loblaws.
+        the second element is the category list, which is a list of strings
+
+    :param headless: boolen for representing whether it runs in headless mode
+    :param disableimage: boolen for representing whether it runs in image-less mode
+    :return: a 3-element tuple list which the first element is the item page url,
+        the second element is the category list from the second element in the parameter url_category_tuple,
+        the third element is the current presented price & other formats of the presented price if any separated by comma
+        boolean False when error happened
+    """
+    url = url_category_tuple[0]
+    category_list = url_category_tuple[1]
+    options = Options()
+    if headless:
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')  # Last I checked this was necessary.
+        options.add_argument("window-size=1920,1080")
+    if disableimage:
+        options.add_argument('--blink-settings=imagesEnabled=false')
+
+    driver = webdriver.Chrome(web_driver_loc, options=options)
+    driver.get(url)
+
+    result = load_more(driver)
+
+    logger.debug('load more button clicked total {} times for url:\n{}'.format(result,url))
+
+    try:
+        current_pagination = driver.find_element_by_class_name('pagination').text
+        total_item_listed = int(current_pagination[2:].split(' ')[0])
+        item_elements = driver.find_elements_by_class_name('product-tile__details')
+
+        if len(item_elements) != total_item_listed:
+            # do it again if it does not match :)
+            time.sleep(1)
+            item_elements = driver.find_elements_by_class_name('product-tile__details')
+            if len(item_elements) != total_item_listed:
+                logger.error('total number of item showing in pagination does not match with items found in page'
+                             ' when getting itempage urls for url:\n{}\n{}'.format(url, traceback.format_exc()))
+                return False
+
+        result_list = []
+        print(len(item_elements))
+        for element in item_elements:
+
+            itempage_url = element.find_element_by_class_name('product-tile__details__info__name__link').get_attribute('href')
+            current_price = element.find_element_by_css_selector('.price.selling-price-list__item__price.selling-price-list__item__price--now-price').text
+            comparison_price = element.find_element_by_css_selector('.comparison-price-list.comparison-price-list--product-tile.comparison-price-list--product-tile').text
+            cp_list = comparison_price.split('$')
+            return_price = current_price
+            if len(cp_list) > 1:
+                for i in range(1, len(cp_list)):
+                    return_price = return_price + ',$' + cp_list[i]
+            """print('current price:{}:'.format(current_price))
+            print('comparison_price:',comparison_price)
+            print(return_price)"""
+            result_list.append((itempage_url,category_list,return_price))
+        logger.info("all itempages' link collected in url\n{}".format(url))
+        return result_list
+
+    except:
+        logger.error('error when getting itempage urls for url:\n{}\n{}'.format(url,traceback.format_exc()))
+        return False
+
 
 def load_more(driver):
     """
@@ -186,3 +257,6 @@ def has_more_subcategories(url_category_tuple,headless=False,disableimage=False)
     else:
         logger.error('unexpected situation, num of li element is smaller than 0 for url \n{}\n the website code might have changed'.format(url))
         return False
+#get_link_price(('https://www.loblaws.ca/Food/Deli/Deli-Meats/Beef/plp/LSL001002001002?navid=CLP-L5-Beef',[]))
+
+#print(get_link_price(('https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Organic-Vegetables/plp/LSL001001006000',['test'])))
