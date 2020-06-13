@@ -204,7 +204,13 @@ class Server_Loblaws():
             logger.debug('server is getting links, please try again later')
             return False
 
-
+    def write_price_to_db(self, brand='Loblaws'):
+        select id from item_url where url='xxxx'
+        if result is empty, insert url first
+        then search again for id,
+            use it with daily_id and price string to insert in to item_price
+    def get_loblaws_item_prices(self, url_category_tuple):
+        get_link_price((url_category_tuple[0], category_list), headless=True, disableimage=True)
     def get_loblaws_item_links(self, url_category_tuple):
         try:
             result = has_more_subcategories(url_category_tuple, headless=True, disableimage=True)
