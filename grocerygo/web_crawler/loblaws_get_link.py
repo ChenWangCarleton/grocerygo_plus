@@ -63,8 +63,20 @@ def get_item_detail(id_url_tuple, headless=False, disableimage=False):
         element_present = EC.presence_of_element_located((By.CLASS_NAME, 'product-details-page-details__content__name'))
         WebDriverWait(driver, 10).until(element_present)
 
+        name = driver.title.replace(' | Loblaws', '')
+        name_not_right_counter = 0
+        while name =='Loblaws':
+            time.sleep(1)
+            name = driver.title.replace(' | Loblaws', '')
+            name_not_right_counter += 1
+            if name_not_right_counter > 10:
+                logger.error('name not correct after 10 attempts, title is:{}. for value\n{}'.format(driver.title, id_url_tuple))
+                return False
         current_item_element = driver.find_element_by_class_name('product-details-page-details__content__name')
+        """current_item_element = driver.find_element_by_class_name('product-details-page-details__content__name')
         name = current_item_element.find_element_by_css_selector('.product-name__item.product-name__item--name').text
+        if not name: # in case the top didn't work
+            name = driver.title.replace(' | Loblaws','')"""
         brand = None
         try:
             selenium_input = '.product-name__item.product-name__item--brand'
@@ -119,9 +131,8 @@ def get_item_detail(id_url_tuple, headless=False, disableimage=False):
     except:
         logger.error('error when getting item detail for id:{}  url:\n{}\n{}'.format(item_id, url,traceback.format_exc()))
         return False
-
-
-
+    finally:
+        driver.close()
 
 def get_link(url_category_tuple,headless=False,disableimage=False):
     """
@@ -180,6 +191,8 @@ def get_link(url_category_tuple,headless=False,disableimage=False):
         logger.error('error when getting itempage urls for url:\n{}\n{}'.format(url,traceback.format_exc()))
         return False
 
+    finally:
+        driver.close()
 
 def get_link_price(url_category_tuple,headless=False,disableimage=False):
     """
@@ -252,6 +265,8 @@ def get_link_price(url_category_tuple,headless=False,disableimage=False):
         logger.error('error when getting itempage urls for url:\n{}\n{}'.format(url,traceback.format_exc()))
         return False
 
+    finally:
+        driver.close()
 
 def load_more(driver):
     """
@@ -331,32 +346,38 @@ def has_more_subcategories(url_category_tuple,headless=False,disableimage=False)
         options.add_argument('--blink-settings=imagesEnabled=false')
 
     driver = webdriver.Chrome(web_driver_loc, options=options)
-    driver.get(url)
     try:
-        element_present = EC.presence_of_element_located((By.CLASS_NAME, 'category-filter__subcategories'))
-        WebDriverWait(driver, 10).until(element_present)
-    except:
-        logger.error('error when waiting for element on url:\n{}\n{}'.format(url, traceback.format_exc()))
-    subcategories_class = driver.find_element_by_class_name('category-filter__subcategories')
-    li_elements = subcategories_class.find_elements_by_tag_name('li')
-    current_category = li_elements[0].text
-    print(current_category)
-    if len(li_elements) == 1:
-        logger.info('No more subcategory under category: {} with url:\n{}'.format(url, current_category))
-        return current_category
-    elif len(li_elements) > 1:
-        result_list = []
-        for i in range(1, len(li_elements)):
+        driver.get(url)
+        try:
+            element_present = EC.presence_of_element_located((By.CLASS_NAME, 'category-filter__subcategories'))
+            WebDriverWait(driver, 10).until(element_present)
+        except:
+            logger.error('error when waiting for element on url:\n{}\n{}'.format(url, traceback.format_exc()))
+        subcategories_class = driver.find_element_by_class_name('category-filter__subcategories')
+        li_elements = subcategories_class.find_elements_by_tag_name('li')
+        current_category = li_elements[0].text
+        print(current_category)
+        if len(li_elements) == 1:
+            logger.info('No more subcategory under category: {} with url:\n{}'.format(url, current_category))
+            return current_category
+        elif len(li_elements) > 1:
+            result_list = []
+            for i in range(1, len(li_elements)):
 
-            sub_category_url = li_elements[i].find_element_by_tag_name('a').get_attribute('href')
-            logger.debug(sub_category_url)
-            temp_category_list = url_category_tuple[1].copy()
-            temp_category_list.append(current_category)
-            result_list.append((sub_category_url, temp_category_list))
-        return result_list
-    else:
-        logger.error('unexpected situation, num of li element is smaller than 0 for url \n{}\n the website code might have changed'.format(url))
-        return False
+                sub_category_url = li_elements[i].find_element_by_tag_name('a').get_attribute('href')
+                logger.debug(sub_category_url)
+                temp_category_list = url_category_tuple[1].copy()
+                temp_category_list.append(current_category)
+                result_list.append((sub_category_url, temp_category_list))
+            return result_list
+        else:
+            logger.error('unexpected situation, num of li element is smaller than 0 for url \n{}\n the website code might have changed'.format(url))
+            return False
+    except:
+        logger.error('unexpected error in has_more_subcategories with url\n{}'.format(url))
+
+    finally:
+        driver.close()
 #get_link_price(('https://www.loblaws.ca/Food/Deli/Deli-Meats/Beef/plp/LSL001002001002?navid=CLP-L5-Beef',[]))
 
 #print(get_link_price(('https://www.loblaws.ca/Food/Fruits-%26-Vegetables/Organic-Vegetables/plp/LSL001001006000',['test'])))

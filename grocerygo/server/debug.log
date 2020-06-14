@@ -1,0 +1,5 @@
+[0614/023532.164:ERROR:registration_protocol_win.cc(131)] TransactNamedPipe: The pipe has been ended. (0x6D)
+[0614/023532.779:ERROR:registration_protocol_win.cc(64)] BuildSecurityDescriptor: The specified network provider name is invalid. (0x4B4)
+[0614/023532.847:ERROR:registration_protocol_win.cc(131)] TransactNamedPipe: The pipe has been ended. (0x6D)
+[0614/023532.848:ERROR:file_io.cc(89)] ReadExactly: expected 40, observed 0
+[0614/023538.471:ERROR:crashpad_client_win.cc(508)] CreateProcess: The paging file is too small for this operation to complete. (0x5AF)

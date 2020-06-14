@@ -26,6 +26,11 @@ loblaws_server_dict = {
     "failed_price": loblaws_server.return_get_price_failed_list,
     'write_price': loblaws_server.start_writting_price,
     'retry_price': loblaws_server.retry_first_max_failed_get_price_list,
+    'initial_detail': loblaws_server.start_getting_item_detail,
+    'detail_list': loblaws_server.get_id_url_tuple_list,
+    'detail_failed': loblaws_server.get_failed_item_detail_tuple_list,
+    'retry_detail': loblaws_server.retry_failed_get_item_detail
+
 }
 class Message:
     def __init__(self, selector, sock, addr):

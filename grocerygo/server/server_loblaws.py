@@ -49,6 +49,13 @@ class Server_Loblaws():
 
         self.daily_id = 'XXXX0001'
 
+        self.failed_get_item_detail_tuple_list = []
+        self.id_url_tuple_list = []
+        self.item_detail_result_tuple_list = []
+        self.getting_item_detail = False
+        self.get_item_detail_thread_count = 0
+        self.item_detail_thread_lock = threading.Lock()
+        self.item_detail_max_write_length=20
 
         self.monitor = threading.Thread(target=self.monitor_thread)
         self.monitor.start()
@@ -59,14 +66,72 @@ class Server_Loblaws():
             self.category_list.append(element[0])
         #print(self.category_set)
 
+    def retry_failed_get_item_detail(self):
+        if not self.getting_item_detail and len(self.failed_get_item_detail_tuple_list) > 0:
+            self.id_url_tuple_list = self.failed_get_item_detail_tuple_list.copy()
+            self.failed_get_item_detail_tuple_list = []
+            self.getting_item_detail = True
+            logger.debug('retrying getting failed get_item_detail, total {} id_url tuple to retry'.format(len(self.id_url_tuple_list)))
+            return True
+        else:
+            return False
 
-    def get_id_url(self,category, brand='Loblaws'):
+    def start_getting_item_detail(self,category='', brand='Loblaws'):
         # get list of (item_id, url) tuple from database
-        result = self.data.select_from_table('item_url', "source_brand='{}' and category='{}'".format(brand, category), 'item_id', 'url')
-        #print(result)
-        return result
+        try:
+            if category:
+                result = self.data.select_from_table('item_url', "source_brand='{}' and category='{}'".format(brand, category), 'item_id', 'url')
+            else:
+                result = self.data.select_from_table('item_url',
+                                                     "source_brand='{}'".format(brand, category),
+                                                     'item_id', 'url')
+            self.id_url_tuple_list.extend(result)
+            self.getting_item_detail = True
+            return True
+        except:
+            logger.error('unexpected error when start_getting_item_detail')
+            return False
+    def get_id_url_tuple_list(self):
+        return self.id_url_tuple_list
+    def get_failed_item_detail_tuple_list(self):
+        return self.failed_get_item_detail_tuple_list
+    def get_item_detail_thread(self, id_url_tuple):
+        with self.item_detail_thread_lock:
+            self.get_item_detail_thread_count +=1
+        try:
+            result = get_item_detail(id_url_tuple,headless=True, disableimage=True)
+            if not result:
+                logger.error('error when geting item detail with value:{}'.format(id_url_tuple))
+                self.failed_get_item_detail_tuple_list.append(id_url_tuple)
+            elif result == 'unavailable':
+                logger.error('page unavailable when geting item detail with value:{}'.format(id_url_tuple))
+                self.failed_get_item_detail_tuple_list.append(id_url_tuple)
+            else:
+                self.item_detail_result_tuple_list.append(result)
+        except:
+            self.failed_get_item_detail_tuple_list.append(id_url_tuple)
+            logger.error('unexpected error in get_item_detail_thread')
+        finally:
+            with self.item_detail_thread_lock:
+                self.get_item_detail_thread_count -=1
 
 
+
+
+    def write_item_to_db(self, item_tuple_list):
+        """
+        :param item_tuple:  a 6-element tuple (item_id, name, brand, description, ingredient, imgsrc)
+        :return:
+        """
+        respond = self.data.execute_insert('item',
+                                           columnnames=['item_id', 'name', 'brand', 'description', 'ingredient', 'img_src'],
+                                           attributes=item_tuple_list)
+
+        if not respond:
+            logger.error('error when write_item_to_db, terminating the writing process now, '
+                         'please try again once the database issue is fixed')
+            return False
+        return True
     def write_link_to_db(self, brand='Loblaws'):
         while len(self.get_link_result_list) > 0:
 
@@ -162,14 +227,17 @@ class Server_Loblaws():
                      'current {} elements in get_link_failed_list.\n' \
                      'current {} elements in get_price_result_list\n' \
                      'current {} elements in get_price_failed_list.\n' \
-                     'getting_links:{}, getting_price:{}, writting_links_to_db:{}, writting_prices_to_db:{}.'.format(self.getting_links,
+                     'getting_links:{}, getting_price:{}, writting_links_to_db:{}, writting_prices_to_db:{}.\n' \
+                     'current {} element in id_url_tuple_list, {} element in failed_item_list, ' \
+                     'current {} thread for get item detail, getting_item_detail:{}, current {} in item_detail_result_tuple_list'.format(self.getting_links,
                                                                            self.get_link_loblaws_tuple_queue.qsize(),
                                                                            self.current_running_thread,
                                                                            len(self.get_link_result_list),
                                                                            len(self.get_link_failed_list),total_item_link,
                                                                            len(self.get_price_result_list),
                                                                            len(self.get_price_failed_list),
-                                                                            self.getting_links, self.getting_price, self.writting_links_to_db, self.writting_prices_to_db)
+                                                                        self.getting_links, self.getting_price, self.writting_links_to_db, self.writting_prices_to_db,
+                                                                                            len(self.id_url_tuple_list), len(self.failed_get_item_detail_tuple_list), self.get_item_detail_thread_count,self.getting_item_detail, len(self.item_detail_result_tuple_list))
         return result_str
     def initial_get_loblaws_item_price(self):
         if self.getting_price:
@@ -236,8 +304,31 @@ class Server_Loblaws():
                                          args=(url_category_tuple,)).start()
                         logger.debug('started a new thread for get_loblaws_item_prices, current {} running thread'
                                      .format(self.current_running_thread))
+            if self.getting_item_detail:
+                while len(self.id_url_tuple_list) > 0 and self.get_item_detail_thread_count < self.max_running_thread:
+                    id_url_tuple = self.id_url_tuple_list.pop(0)
 
+                    threading.Thread(target=self.get_item_detail_thread,
+                                     args=(id_url_tuple,)).start()
+                    logger.debug('started a new thread for get_item_detail_thread, current {} running thread'
+                                 .format(self.get_item_detail_thread_count))
 
+                if len(self.id_url_tuple_list) == 0 and self.get_item_detail_thread_count == 0:
+                    self.getting_item_detail = False
+
+                if len(self.item_detail_result_tuple_list) > self.item_detail_max_write_length:
+                    detail_tuple_list = self.item_detail_result_tuple_list[:self.item_detail_max_write_length]
+                    respond = self.write_item_to_db(detail_tuple_list)
+                    if respond:
+                        self.item_detail_result_tuple_list = self.item_detail_result_tuple_list[self.item_detail_max_write_length:]
+                    else:
+                        logger.error("error when write item detail into db, please check db connection")
+            elif len(self.item_detail_result_tuple_list)>0:
+                respond = self.write_item_to_db(self.item_detail_result_tuple_list)
+                if respond:
+                    self.item_detail_result_tuple_list = []
+                else:
+                    logger.error("error when write item detail into db, please check db connection")
             if self.quit_server:
                 logger.info('ending server_loblaws monitor thread')
                 break
