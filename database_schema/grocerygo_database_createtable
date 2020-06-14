@@ -18,8 +18,8 @@ CREATE TABLE `item` (
   `name` varchar(255) NOT NULL,
   `brand` varchar(70) DEFAULT NULL,
   `description` text,
-  `ingrident` text,
   `img_src` varchar(1024) DEFAULT NULL,
+  `ingredient` text,
   PRIMARY KEY (`item_id`),
   CONSTRAINT `item_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item_url` (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
