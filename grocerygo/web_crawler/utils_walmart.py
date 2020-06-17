@@ -41,15 +41,15 @@ def has_subcategory(url, headless=False,disableimage=False):
     """
     This functions create a driver based on the url string and check if there's any more subcategories under it.
     If there's any returns list of strings represents the urls,
-    If not, return None
-    If failed, return False
+    If not, return False
+    If failed, return None
     :param url: string
     :param headless:
     :param disableimage:
     :return:
     A list of strings(urls) if it has subcategories,
-    None if no subcategories,
-    False if error happened
+    None if error happened
+    False if no subcategories
     """
     magic_index = 1
     options = Options()
@@ -86,7 +86,7 @@ def has_subcategory(url, headless=False,disableimage=False):
             return result_list
         except NoSuchElementException:
             logger.debug('no more subcategory for url: {}'.format(url))
-            return None
+            return False
         #print(parent.get_attribute('class'))
         #print(re.search(r'category-list l-(.*?) collapsed', parent.get_attribute('class')).group(1))
         """for base in base_elements:
@@ -96,6 +96,49 @@ def has_subcategory(url, headless=False,disableimage=False):
 
     except:
         logger.error('unexpected error in has_more_subcategories with url\n{}\n{}'.format(url,traceback.format_exc()))
-        return False
+        return None
     finally:
         driver.close()
+
+
+def click_next_page(driver):
+    """
+    This function checks if there is next page in the current page opened in driver.
+    If there is, click next page and return True
+    If not, return False,
+    If unexpected error happens, return None
+    :param driver:
+    :return:
+    Boolean True if there is next page and clicked
+    Boolean False if there is no more next page
+    None if unexpected error happens
+    """
+    try:
+        element_present = EC.presence_of_element_located((By.ID, 'shelf-sort-count'))
+        WebDriverWait(driver, 10).until(element_present)
+        pagination = driver.find_element_by_id('shelf-sort-count')
+        last_page_number = pagination.find_element_by_class_name('last-rec-num').text
+        total_page_number = pagination.find_element_by_class_name('total-num-recs').text
+        if last_page_number == total_page_number:
+            logger.debug('no next page for url: {}'.format(driver.current_url))
+            return False
+        else:
+            # driver.find_element_by_class_name('page-select-list-btn').click()
+            # clicking the webelement didn't work due to error
+            """
+            selenium.common.exceptions.ElementClickInterceptedException: Message: element click intercepted: Element <a href="/en/grocery/pantry-food/chips-snacks/fruit-snacks/N-3782/page-2" id="loadmore" class="page-select-list-btn" attr-page-id="1" aria-label="Next 60 items" analytics-trigger="search" analytics-data="next results page">...</a> is not clickable at point (543, 906). Other element would receive the click: <div class="privacy-copy">...</div>
+            (Session info: chrome=83.0.4103.97)
+            """
+            # thus, getting the next page's url and load the page with driver
+            next_page_url = driver.find_element_by_class_name('page-select-list-btn').get_attribute('href')
+            driver.get(next_page_url)
+
+            # wait till the page fully loaded before returning
+            element_present = EC.presence_of_element_located((By.ID, 'shelf-sort-count'))
+            WebDriverWait(driver, 10).until(element_present)
+
+            logger.debug('next page clicked for url: {}'.format(driver.current_url))
+            return True
+    except:
+        logger.error('unexpected error in click_next_page with url\n{}\n{}'.format(driver.current_url, traceback.format_exc()))
+        return None
