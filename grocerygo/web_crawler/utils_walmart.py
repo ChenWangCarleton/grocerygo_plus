@@ -233,6 +233,11 @@ def get_item_link_price(driver):
                 current_price = element.find_element_by_class_name('price-current').text
             except NoSuchElementException:
                 current_price = element.find_element_by_css_selector('.price-current.width-adjusted').text
+            assert current_price # make sure price is not empty
+            price_unit_description = element.find_element_by_class_name('description').text
+            if price_unit_description:
+                current_price = current_price + '/' + price_unit_description
+
             #print(current_price)
             unit_price = element.find_element_by_class_name('price-unit').text
             #print(unit_price)
@@ -241,7 +246,6 @@ def get_item_link_price(driver):
             else:
                 final_price = current_price
             #print(final_price)
-            assert final_price # make sure price is not empty
             url_category_price_tuple_list.append((url, category_list.copy(), final_price))
         return url_category_price_tuple_list
 
@@ -249,13 +253,101 @@ def get_item_link_price(driver):
     except:
         logger.error('unexpected error in get_item_link_price with url\n{}\n{}'.format(driver.current_url, traceback.format_exc()))
         return None
-test='https://www.walmart.ca/en/grocery/frozen-food/ice-cream-treats/frozen-yogurt/N-9397'
+
+
+def get_item_detail(id_url_tuple, headless=False, disableimage=False):
+    """
+    This function gets the item detail from giving id_url_tuple which is a 2-element tuple that
+    the first element is the item_id, the second element is the url of the item page.
+
+    if things go well, it collect the item name, brand if exist, description if exist, ingrident list if exist
+    then return a 6-element tuple (item_id, name, brand, description, ingrident, imgsrc)
+    Return None when unexpected error happens
+    :param id_url_tuple: a 2-element tuple that
+    the first element is the item_id, the second element is the url of the item page.
+    :param headless: boolen for representing whether it runs in headless mode
+    :param disableimage: boolen for representing whether it runs in image-less mode
+    :return:
+    a 6-element tuple (item_id, name, brand, description, ingrident, imgsrc)
+    Return None when unexpected error happens
+    """
+    item_id = id_url_tuple[0]
+    url = id_url_tuple[1]
+    options = Options()
+    if headless:
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')  # Last I checked this was necessary.
+        options.add_argument("window-size=1920,1080")
+    if disableimage:
+        options.add_argument('--blink-settings=imagesEnabled=false')
+
+    driver = webdriver.Chrome(web_driver_loc, options=options)
+
+    try:
+        driver.get(url)
+
+        selenium_selector = '.css-1c6krh5.e1yn5b3f7' # css selector for name
+
+        element_present = EC.presence_of_element_located((By.CSS_SELECTOR, selenium_selector))
+        WebDriverWait(driver, 10).until(element_present)
+
+        name = driver.find_element_by_css_selector(selenium_selector).text
+
+        selenium_selector = '.css-uxtmi3.e1yn5b3f5' # brand name element
+        brand_element = driver.find_element_by_css_selector(selenium_selector)
+        try:
+            brand = brand_element.find_element_by_css_selector('.css-peqszk.elkyjhv0').text
+        except NoSuchElementException:
+            brand = None
+
+        selenium_selector = '.css-1wbz2q6.eqaamsw6' # expand buttons to be click for collecting description and specifications
+        expand_buttons = driver.find_elements_by_css_selector(selenium_selector)
+
+
+        selenium_selector = '.css-1rnr3ji.e1mpbtcv3' # description element
+        description = driver.find_element_by_css_selector(selenium_selector).text
+        if not description:
+            description = None
+
+        selenium_selector = '.css-1avgzwm.eqaamsw0' # buttons to be expanded, the ingredient should be in the third elements [1]
+        ingredient_text_selector = '.css-xnob7h.eqaamsw1' # ingredient element
+        ingredient_element = driver.find_elements_by_css_selector(selenium_selector)[1]
+        try:
+            ingredient = ingredient_element.find_element_by_css_selector(ingredient_text_selector).text
+            if not ingredient:
+                ingredient = ingredient_element.find_element_by_css_selector(ingredient_text_selector).get_attribute('innerText')
+
+            if 'Ingredients' not in ingredient:
+                ingredient = None
+            else:
+                ingredient = ingredient[:ingredient.find('At Walmart Canada')] # remove the unwanted part
+        except NoSuchElementException:
+            print('no ingredient')
+            ingredient = None
+        #input('pause')
+        selenium_selector = '.css-13lh8gl.ervhxpq1' #image elements selector should be the first one
+        img_src = driver.find_elements_by_css_selector(selenium_selector)[0].get_attribute('src')
+
+        return (item_id, name, brand, description, ingredient, img_src)
+    except:
+        logger.error('unexpected error when get_item_detail with id_url_tuple:{}\n'.format(id_url_tuple, traceback.format_exc()))
+        return None
+    finally:
+        driver.close()
+
+
+"""test='https://www.walmart.ca/en/grocery/frozen-food/ice-cream-treats/frozen-yogurt/N-9397'
 fruit = 'https://www.walmart.ca/en/grocery/fruits-vegetables/fruits/N-3852'
+fruit_snack='https://www.walmart.ca/en/grocery/pantry-food/chips-snacks/fruit-snacks/N-3782'
 options = Options()
 options.add_argument('--blink-settings=imagesEnabled=false')
 driver = webdriver.Chrome(web_driver_loc, options=options)
-driver.get(fruit)
+driver.get(fruit_snack)
 result = get_item_link_price(driver)
 for i in result:
     print(i)
-driver.close()
+driver.close()"""
+
+item_d_all = 'https://www.walmart.ca/en/ip/great-value-honey-greek-yogurt-smoothie-bars/6000200313230'
+item_d_nod_nob_noI = 'https://www.walmart.ca/en/ip/pears-bartlett/6000187833002'
+print(get_item_detail((1,item_d_nod_nob_noI)))
