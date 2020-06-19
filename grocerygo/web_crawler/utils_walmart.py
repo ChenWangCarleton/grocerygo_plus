@@ -117,9 +117,9 @@ def click_next_page(driver):
         element_present = EC.presence_of_element_located((By.ID, 'shelf-sort-count'))
         WebDriverWait(driver, 10).until(element_present)
         pagination = driver.find_element_by_id('shelf-sort-count')
-        last_page_number = pagination.find_element_by_class_name('last-rec-num').text
-        total_page_number = pagination.find_element_by_class_name('total-num-recs').text
-        if last_page_number == total_page_number:
+        current_page_items = pagination.find_element_by_class_name('last-rec-num').text
+        total_items = pagination.find_element_by_class_name('total-num-recs').text
+        if current_page_items == total_items:
             logger.debug('no next page for url: {}'.format(driver.current_url))
             return False
         else:
@@ -142,3 +142,120 @@ def click_next_page(driver):
     except:
         logger.error('unexpected error in click_next_page with url\n{}\n{}'.format(driver.current_url, traceback.format_exc()))
         return None
+
+def get_item_link(driver):
+    """
+    This function get the all the items' link and the categories in the current page opened in driver
+    It returns a 2-element tuple with a list of all urls as the first element, categories list as the second element
+    It returns None when unexpected error happens
+    :param driver:
+    :return:
+    a 2-element tuple with a list of all urls as the first element, categories list as the second element
+    None when error happens
+    """
+    try:
+        url_list = []
+        category_list = []
+        element_present = EC.presence_of_element_located((By.ID, 'shelf-sort-count'))
+        WebDriverWait(driver, 10).until(element_present)
+        pagination = driver.find_element_by_id('shelf-sort-count')
+        current_page_items = int(pagination.find_element_by_class_name('last-rec-num').text)
+        item_elements = driver.find_elements_by_class_name('product-link')
+
+        #make sure the elements showing in the pagination matches the elements found
+        if len(item_elements) != current_page_items:
+            logger.debug('item elements does not match total item on the pagination on the first try\n'
+                         'total items on pagination:{}, item elements found:{}, url:{}'.format(current_page_items,len(item_elements), driver.current_url))
+            time.sleep(2)
+            item_elements = driver.find_elements_by_class_name('product-link')
+            logger.debug('Second try after waiting 2 seconds, total items on pagination:{}, item elements found:{}, url:{}'.format(current_page_items,len(item_elements), driver.current_url))
+            assert current_page_items == len(item_elements)
+
+        for element in item_elements:
+            url_list.append(element.get_attribute('href'))
+
+        # get category list
+        category_elements = driver.find_element_by_css_selector('.category-list.l-1.collapsed').find_elements_by_class_name('link')
+        for element in category_elements:
+            category_list.append(element.find_elements_by_tag_name('span')[0].text)
+        return (url_list, category_list)
+
+
+    except:
+        logger.error('unexpected error in get_item_link with url\n{}\n{}'.format(driver.current_url, traceback.format_exc()))
+        return None
+
+def get_item_link_price(driver):
+    """
+    This function get the all the items' link and the categories in the current page opened in driver
+    It returns a 3-element tuple list with the url as the first element, categories list as the second element and all prices as the third element
+    It returns None when unexpected error happens
+    :param driver:
+    :return:
+    a 3-element tuple list with the url as the first element, categories list as the second element and the current presented price & other formats of the presented price if any separated by comma
+    None when error happens
+    """
+    try:
+        url_category_price_tuple_list = []
+        category_list = []
+        element_present = EC.presence_of_element_located((By.ID, 'shelf-sort-count'))
+        WebDriverWait(driver, 10).until(element_present)
+
+        try:
+           close_button =  driver.find_element_by_class_name('sliver-modal-container')
+           logger.debug('extra close button needed on url:{}'.format(driver.current_url))
+           time.sleep(1)
+           close_button.click()
+        except:
+           logger.debug('no extra close button needed on url:{}'.format(driver.current_url))
+
+        pagination = driver.find_element_by_id('shelf-sort-count')
+        current_page_items = int(pagination.find_element_by_class_name('last-rec-num').text)
+        item_elements = driver.find_elements_by_class_name('product-link')
+
+        # get category list
+        category_elements = driver.find_element_by_css_selector('.category-list.l-1.collapsed').find_elements_by_class_name('link')
+        for element in category_elements:
+            category_list.append(element.find_elements_by_tag_name('span')[0].text)
+
+        #make sure the elements showing in the pagination matches the elements found
+        if len(item_elements) != current_page_items:
+            logger.debug('item elements does not match total item on the pagination on the first try\n'
+                         'total items on pagination:{}, item elements found:{}, url:{}'.format(current_page_items,len(item_elements), driver.current_url))
+            time.sleep(2)
+            item_elements = driver.find_elements_by_class_name('product-link')
+            logger.debug('Second try after waiting 2 seconds, total items on pagination:{}, item elements found:{}, url:{}'.format(current_page_items,len(item_elements), driver.current_url))
+            assert current_page_items == len(item_elements)
+
+        for element in item_elements:
+            url = element.get_attribute('href')
+            try:
+                current_price = element.find_element_by_class_name('price-current').text
+            except NoSuchElementException:
+                current_price = element.find_element_by_css_selector('.price-current.width-adjusted').text
+            #print(current_price)
+            unit_price = element.find_element_by_class_name('price-unit').text
+            #print(unit_price)
+            if unit_price:
+                final_price = current_price + ','+unit_price
+            else:
+                final_price = current_price
+            #print(final_price)
+            assert final_price # make sure price is not empty
+            url_category_price_tuple_list.append((url, category_list.copy(), final_price))
+        return url_category_price_tuple_list
+
+
+    except:
+        logger.error('unexpected error in get_item_link_price with url\n{}\n{}'.format(driver.current_url, traceback.format_exc()))
+        return None
+test='https://www.walmart.ca/en/grocery/frozen-food/ice-cream-treats/frozen-yogurt/N-9397'
+fruit = 'https://www.walmart.ca/en/grocery/fruits-vegetables/fruits/N-3852'
+options = Options()
+options.add_argument('--blink-settings=imagesEnabled=false')
+driver = webdriver.Chrome(web_driver_loc, options=options)
+driver.get(fruit)
+result = get_item_link_price(driver)
+for i in result:
+    print(i)
+driver.close()
