@@ -159,15 +159,21 @@ def get_item_link(driver):
         element_present = EC.presence_of_element_located((By.ID, 'shelf-sort-count'))
         WebDriverWait(driver, 10).until(element_present)
         pagination = driver.find_element_by_id('shelf-sort-count')
+
         current_page_items = int(pagination.find_element_by_class_name('last-rec-num').text)
-        item_elements = driver.find_elements_by_class_name('product-link')
+        current_page_items = current_page_items % 60 # had a really weird bug so that this seem to be the only way to get correct item count
+        if current_page_items == 0:
+            current_page_items = 60
+
+        shelf_element = driver.find_element_by_id('shelf-page')
+        item_elements = shelf_element.find_elements_by_class_name('product-link')
 
         #make sure the elements showing in the pagination matches the elements found
         if len(item_elements) != current_page_items:
             logger.debug('item elements does not match total item on the pagination on the first try\n'
                          'total items on pagination:{}, item elements found:{}, url:{}'.format(current_page_items,len(item_elements), driver.current_url))
             time.sleep(2)
-            item_elements = driver.find_elements_by_class_name('product-link')
+            item_elements = shelf_element.find_elements_by_class_name('product-link')
             logger.debug('Second try after waiting 2 seconds, total items on pagination:{}, item elements found:{}, url:{}'.format(current_page_items,len(item_elements), driver.current_url))
             assert current_page_items == len(item_elements)
 
@@ -211,7 +217,12 @@ def get_item_link_price(driver):
 
         pagination = driver.find_element_by_id('shelf-sort-count')
         current_page_items = int(pagination.find_element_by_class_name('last-rec-num').text)
-        item_elements = driver.find_elements_by_class_name('product-link')
+        current_page_items = current_page_items % 60 # had a really weird bug so that this seem to be the only way to get correct item count
+        if current_page_items == 0:
+            current_page_items = 60
+
+        shelf_element = driver.find_element_by_id('shelf-page')
+        item_elements = shelf_element.find_elements_by_class_name('product-link')
 
         # get category list
         category_elements = driver.find_element_by_css_selector('.category-list.l-1.collapsed').find_elements_by_class_name('link')
@@ -223,7 +234,7 @@ def get_item_link_price(driver):
             logger.debug('item elements does not match total item on the pagination on the first try\n'
                          'total items on pagination:{}, item elements found:{}, url:{}'.format(current_page_items,len(item_elements), driver.current_url))
             time.sleep(2)
-            item_elements = driver.find_elements_by_class_name('product-link')
+            item_elements = shelf_element.find_elements_by_class_name('product-link')
             logger.debug('Second try after waiting 2 seconds, total items on pagination:{}, item elements found:{}, url:{}'.format(current_page_items,len(item_elements), driver.current_url))
             assert current_page_items == len(item_elements)
 
@@ -335,7 +346,90 @@ def get_item_detail(id_url_tuple, headless=False, disableimage=False):
     finally:
         driver.close()
 
+def get_all_category_link(url, headless=False, disableimage=False):
+    """
+    get all the items' link in the current category.
+    It returns a 2-element tuple list with url as the first element, categories list as the second element
+    example: [(urlA,[categoryA, categoryB]),(urlB,[categoryA, categoryB])]
+    It returns None when unexpected error happens
+    :param url:
+    :param headless:
+    :param disableimage:
+    :return:
+    It returns a 2-element tuple with a list of all urls as the first element, categories list as the second element
+    It returns None when unexpected error happens
+    """
+    options = Options()
+    if headless:
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')  # Last I checked this was necessary.
+        options.add_argument("window-size=1920,1080")
+    if disableimage:
+        options.add_argument('--blink-settings=imagesEnabled=false')
 
+    driver = webdriver.Chrome(web_driver_loc, options=options)
+    try:
+        driver.get(url)
+        result_list = []
+
+        while True:
+
+            current_page_result = get_item_link(driver)
+            urls = current_page_result[0]
+            categories = current_page_result[1]
+            for a_url in urls:
+                result_list.append((a_url, categories.copy()))
+            if not click_next_page(driver):
+                break
+
+        return result_list
+    except:
+        logger.error('unexpected error when get_all_category_link with id_url_tuple:{}\n'.format(url, traceback.format_exc()))
+        return None
+    finally:
+        driver.close()
+
+
+def get_all_category_price(url, headless=False, disableimage=False):
+    """
+    get all the items' link in the current category.
+    It returns a 3-element tuple list with url as the first element, categories list as the second element, price as the third element
+    example: [(urlA,[categoryA, categoryB], priceA),(urlB,[categoryA, categoryB], priceB)]
+    It returns None when unexpected error happens
+    :param url:
+    :param headless:
+    :param disableimage:
+    :return:
+    It returns a 3-element tuple with a list of all urls as the first element, categories list as the second element, price as the third element
+    It returns None when unexpected error happens
+    """
+    options = Options()
+    if headless:
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')  # Last I checked this was necessary.
+        options.add_argument("window-size=1920,1080")
+    if disableimage:
+        options.add_argument('--blink-settings=imagesEnabled=false')
+
+    driver = webdriver.Chrome(web_driver_loc, options=options)
+    try:
+        driver.get(url)
+        result_list = []
+
+        while True:
+
+            current_page_result = get_item_link_price(driver)
+            for result in current_page_result:
+                result_list.append(result)
+            if not click_next_page(driver):
+                break
+
+        return result_list
+    except:
+        logger.error('unexpected error when get_all_category_link with id_url_tuple:{}\n'.format(url, traceback.format_exc()))
+        return None
+    finally:
+        driver.close()
 """test='https://www.walmart.ca/en/grocery/frozen-food/ice-cream-treats/frozen-yogurt/N-9397'
 fruit = 'https://www.walmart.ca/en/grocery/fruits-vegetables/fruits/N-3852'
 fruit_snack='https://www.walmart.ca/en/grocery/pantry-food/chips-snacks/fruit-snacks/N-3782'
@@ -348,6 +442,13 @@ for i in result:
     print(i)
 driver.close()"""
 
-item_d_all = 'https://www.walmart.ca/en/ip/great-value-honey-greek-yogurt-smoothie-bars/6000200313230'
+"""item_d_all = 'https://www.walmart.ca/en/ip/great-value-honey-greek-yogurt-smoothie-bars/6000200313230'
 item_d_nod_nob_noI = 'https://www.walmart.ca/en/ip/pears-bartlett/6000187833002'
-print(get_item_detail((1,item_d_nod_nob_noI)))
+print(get_item_detail((1,item_d_nod_nob_noI)))"""
+
+page_1 = 'https://www.walmart.ca/en/grocery/frozen-food/ice-cream-treats/ice-cream-tubs/N-9394'
+page_2 = 'https://www.walmart.ca/en/grocery/frozen-food/frozen-pizza/N-3832'
+result = get_all_category_price(page_1)
+print(len(result))
+for i in result:
+    print(i)
