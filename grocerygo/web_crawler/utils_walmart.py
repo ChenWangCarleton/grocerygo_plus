@@ -154,7 +154,7 @@ def get_item_link(driver):
     None when error happens
     """
     try:
-        url_list = []
+        result_list = []
         category_list = []
         element_present = EC.presence_of_element_located((By.ID, 'shelf-sort-count'))
         WebDriverWait(driver, 10).until(element_present)
@@ -177,14 +177,16 @@ def get_item_link(driver):
             logger.debug('Second try after waiting 2 seconds, total items on pagination:{}, item elements found:{}, url:{}'.format(current_page_items,len(item_elements), driver.current_url))
             assert current_page_items == len(item_elements)
 
-        for element in item_elements:
-            url_list.append(element.get_attribute('href'))
-
         # get category list
         category_elements = driver.find_element_by_css_selector('.category-list.l-1.collapsed').find_elements_by_class_name('link')
         for element in category_elements:
             category_list.append(element.find_elements_by_tag_name('span')[0].text)
-        return (url_list, category_list)
+
+        for element in item_elements:
+            url = element.get_attribute('href')
+            result_list.append((url, category_list.copy()))
+
+        return result_list
 
 
     except:
@@ -374,11 +376,10 @@ def get_all_category_link(url, headless=False, disableimage=False):
 
         while True:
 
-            current_page_result = get_item_link(driver)
-            urls = current_page_result[0]
-            categories = current_page_result[1]
-            for a_url in urls:
-                result_list.append((a_url, categories.copy()))
+            url_category_tuple_list = get_item_link(driver)
+
+            for url_category_tuple in url_category_tuple_list:
+                result_list.append((url_category_tuple[0], url_category_tuple[1]))
             if not click_next_page(driver):
                 break
 
@@ -446,9 +447,9 @@ driver.close()"""
 item_d_nod_nob_noI = 'https://www.walmart.ca/en/ip/pears-bartlett/6000187833002'
 print(get_item_detail((1,item_d_nod_nob_noI)))"""
 
-page_1 = 'https://www.walmart.ca/en/grocery/frozen-food/ice-cream-treats/ice-cream-tubs/N-9394'
+"""page_1 = 'https://www.walmart.ca/en/grocery/frozen-food/ice-cream-treats/ice-cream-tubs/N-9394'
 page_2 = 'https://www.walmart.ca/en/grocery/frozen-food/frozen-pizza/N-3832'
 result = get_all_category_price(page_1)
 print(len(result))
 for i in result:
-    print(i)
+    print(i)"""
