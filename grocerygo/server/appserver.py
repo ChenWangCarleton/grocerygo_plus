@@ -3,8 +3,8 @@ import socket
 import selectors
 import traceback
 
-import libserver
-
+#import libserver  # for loblaws
+import walmart_libserver as libserver # for walmart
 sel = selectors.DefaultSelector()
 
 

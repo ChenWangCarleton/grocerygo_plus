@@ -130,7 +130,8 @@ def click_next_page(driver):
             (Session info: chrome=83.0.4103.97)
             """
             # thus, getting the next page's url and load the page with driver
-            next_page_url = driver.find_element_by_class_name('page-select-list-btn').get_attribute('href')
+            page_swap_buttons = driver.find_elements_by_class_name('page-select-list-btn')
+            next_page_url = page_swap_buttons[len(page_swap_buttons)-1].get_attribute('href')
             driver.get(next_page_url)
 
             # wait till the page fully loaded before returning
@@ -449,7 +450,8 @@ print(get_item_detail((1,item_d_nod_nob_noI)))"""
 
 """page_1 = 'https://www.walmart.ca/en/grocery/frozen-food/ice-cream-treats/ice-cream-tubs/N-9394'
 page_2 = 'https://www.walmart.ca/en/grocery/frozen-food/frozen-pizza/N-3832'
-result = get_all_category_price(page_1)
+test = 'https://www.walmart.ca/en/grocery/fruits-vegetables/vegetables/N-3854'
+result = get_all_category_link(test)
 print(len(result))
 for i in result:
     print(i)"""
