@@ -281,7 +281,7 @@ def get_item_detail(id_url_tuple, headless=False, disableimage=False):
     :param headless: boolen for representing whether it runs in headless mode
     :param disableimage: boolen for representing whether it runs in image-less mode
     :return:
-    a 6-element tuple (item_id, name, brand, description, ingrident, imgsrc)
+    a 6-element tuple (item_id, name, brand, description, ingredient, imgsrc)
     Return None when unexpected error happens
     """
     item_id = id_url_tuple[0]
