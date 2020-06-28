@@ -18,7 +18,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 class server_metro:
-    def __init__(self, max_thread=3, daily_id='XXXX0003',max_db_input_record=30):
+    def __init__(self, max_thread=1, daily_id='XXXX0003',max_db_input_record=30):
         # since metro is limitting access volume. set max thread to 3. future update can use webcrawler distributed in different locations.
         self.max_thread = max_thread
         self.daily_id = daily_id
@@ -44,7 +44,6 @@ class server_metro:
                               'https://www.metro.ca/en/online-grocery/aisles/beverages',
                               'https://www.metro.ca/en/online-grocery/aisles/beer-wine',
                               'https://www.metro.ca/en/online-grocery/aisles/meat-poultry',
-                              'https://www.metro.ca/en/online-grocery/aisles/organic-groceries',
                               'https://www.metro.ca/en/online-grocery/aisles/snacks',
                               'https://www.metro.ca/en/online-grocery/aisles/frozen',
                               'https://www.metro.ca/en/online-grocery/aisles/bread-bakery-products',
@@ -135,15 +134,15 @@ class server_metro:
             self.current_thread +=1
         try:
 
-            result = utils_metro.get_item_link(url, headless=True, disableimage=True)
-            if result is None:
+            status, result = utils_metro.get_item_link(url, headless=True, disableimage=True)
+            if status is None:
                 logger.error('unexpectd error happened when getting item links from url:{} '.format(url))
                 self.failed_list.append(url)
                 return False
-            if isinstance(result, str):
-                logger.error('url:{}\nfailed at current url: {}'.format(url, result))
-                self.failed_list.append(url)
-                return False
+            if isinstance(status, str):
+                logger.error('url:{}\nfailed at current url: {}'.format(url, status))
+                self.failed_list.append(status)
+
             for record in result:
                 url = record[0]
                 category = record[1]
@@ -168,12 +167,14 @@ class server_metro:
         with self.thread_lock:
             self.current_thread +=1
         try:
-            result = utils_metro.get_item_price(url, headless=True, disableimage=True)
-            if result is None:
+            status, result = utils_metro.get_item_price(url, headless=True, disableimage=True)
+            if status is None:
                 logger.error('unexpectd error happened when getting item links from url:{} '.format(url))
                 self.failed_list.append(url)
                 return False
-
+            if isinstance(status, str):
+                logger.error('url:{}\nfailed at current url: {}'.format(url, status))
+                self.failed_list.append(status)
             for record in result:
                 item_url = record[0]
                 category = record[1]
@@ -221,12 +222,14 @@ class server_metro:
         with self.thread_lock:
             self.current_thread +=1
         try:
-            result = utils_metro.get_item_detail(url, headless=True, disableimage=True)
-            if result is None:
+            status, result = utils_metro.get_item_detail(url, headless=True, disableimage=True)
+            if status is None:
                 logger.error('unexpectd error happened when getting item links from url:{} '.format(url))
                 self.failed_list.append(url)
                 return False
-
+            if isinstance(status, str):
+                logger.error('url:{}\nfailed at current url: {}'.format(url, status))
+                self.failed_list.append(status)
             for record in result:
                 # (item_url, category, name, brand, description, ingredient, img_src)
                 item_url = record[0]

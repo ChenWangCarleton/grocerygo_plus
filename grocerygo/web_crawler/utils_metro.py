@@ -49,10 +49,11 @@ def get_item_link(url, headless=False,disableimage=False):
         options.add_argument('--disable-gpu')  # Last I checked this was necessary.
     if disableimage:
         options.add_argument('--blink-settings=imagesEnabled=false')
+    url_category_tuple_list = []
 
+    driver = webdriver.Chrome(web_driver_loc, options=options)
     try:
 
-        driver = webdriver.Chrome(web_driver_loc, options=options)
 
         driver.get(url)
 
@@ -65,7 +66,6 @@ def get_item_link(url, headless=False,disableimage=False):
             # print(traceback.format_exc())
 
         category = driver.find_element_by_class_name('heading-large-thick').text
-        url_category_tuple_list = []
         print(category)
         page_counter = 0
 
@@ -101,11 +101,13 @@ def get_item_link(url, headless=False,disableimage=False):
                             next_button.click()
                     if loop_lasted_time > 60:
                         logger.error('for url:{}\ncurrent url:{}\nhas been stucked for 60 seconds, returning the current url for future restart'.format(url, current_url))
-                        return current_url
-        return url_category_tuple_list
+                        return current_url, url_category_tuple_list
+        return True, url_category_tuple_list
     except:
         logger.error('unknow error, url:{}\n{}'.format(url, traceback.format_exc()))
-        return None
+        return None, url_category_tuple_list
+    finally:
+        driver.close()
 
 def get_item_price(url, headless=False,disableimage=False):
     """
@@ -132,8 +134,10 @@ def get_item_price(url, headless=False,disableimage=False):
         options.add_argument('--disable-gpu')  # Last I checked this was necessary.
     if disableimage:
         options.add_argument('--blink-settings=imagesEnabled=false')
+    url_category_price_tuple_list = []
+
+    driver = webdriver.Chrome(web_driver_loc, options=options)
     try:
-        driver = webdriver.Chrome(web_driver_loc, options=options)
 
         driver.get(url)
 
@@ -146,7 +150,6 @@ def get_item_price(url, headless=False,disableimage=False):
             # print(traceback.format_exc())
 
         category = driver.find_element_by_class_name('heading-large-thick').text
-        url_category_price_tuple_list = []
         #print(category)
         page_counter = 0
 
@@ -192,11 +195,13 @@ def get_item_price(url, headless=False,disableimage=False):
                             next_button.click()
                     if loop_lasted_time > 60:
                         logger.error('for url:{}\ncurrent url:{}\nhas been stucked for 60 seconds, returning the current url for future restart'.format(url, current_url))
-                        return current_url
-        return url_category_price_tuple_list
+                        return current_url, url_category_price_tuple_list
+        return True, url_category_price_tuple_list
     except:
         logger.error('unknow error, url:{}\n{}'.format(url, traceback.format_exc()))
-        return None
+        return None, url_category_price_tuple_list
+    finally:
+        driver.close()
 
 def get_item_detail(url, headless=False,disableimage=False):
     """
@@ -223,8 +228,11 @@ def get_item_detail(url, headless=False,disableimage=False):
         options.add_argument('--disable-gpu')  # Last I checked this was necessary.
     if disableimage:
         options.add_argument('--blink-settings=imagesEnabled=false')
+
+    item_detail_tuple_list = []
+
+    driver = webdriver.Chrome(web_driver_loc, options=options)
     try:
-        driver = webdriver.Chrome(web_driver_loc, options=options)
 
         driver.get(url)
 
@@ -237,7 +245,6 @@ def get_item_detail(url, headless=False,disableimage=False):
             # print(traceback.format_exc())
 
         category = driver.find_element_by_class_name('heading-large-thick').text
-        item_detail_tuple_list = []
         #print(category)
         page_counter = 0
 
@@ -296,11 +303,13 @@ def get_item_detail(url, headless=False,disableimage=False):
                             next_button.click()
                     if loop_lasted_time > 60:
                         logger.error('for url:{}\ncurrent url:{}\nhas been stucked for 60 seconds, returning the current url for future restart'.format(url, current_url))
-                        return current_url
-        return item_detail_tuple_list
+                        return current_url, item_detail_tuple_list
+        return True, item_detail_tuple_list
     except:
         logger.error('unknow error, url:{}\n{}'.format(url, traceback.format_exc()))
-        return None
+        return None, item_detail_tuple_list
+    finally:
+        driver.close()
 """beer = 'https://www.metro.ca/en/online-grocery/aisles/beer-wine'
 drink = 'https://www.metro.ca/en/online-grocery/aisles/beverages'
 

@@ -11,7 +11,7 @@ request_search = {
     "ring": "In the caves beneath the Misty Mountains. \U0001f48d",
     "\U0001f436": "\U0001f43e Playing ball! \U0001f3d0",
 }
-metro_server = server_metro.server_walmart()
+metro_server = server_metro.server_metro()
 metro_server_dict = {
     "status": metro_server.get_status,
     "quit": metro_server.set_quit_signal,
