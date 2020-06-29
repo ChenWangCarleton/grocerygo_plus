@@ -17,7 +17,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 class server_walmart:
-    def __init__(self, max_thread=10, daily_id='XXXX0002',max_db_input_record=30):
+    def __init__(self, max_thread=10, daily_id='XXXX0001',max_db_input_record=30):
         self.max_thread = max_thread
         self.daily_id = daily_id
         self.current_thread = 0
@@ -36,7 +36,7 @@ class server_walmart:
                                                       'img_src'],
                                              'item_price': ['item_id', 'daily_id', 'price']}
 
-        """self.category_urls = ['https://www.walmart.ca/en/grocery/fruits-vegetables/N-3799',
+        self.category_urls = ['https://www.walmart.ca/en/grocery/fruits-vegetables/N-3799',
                               'https://www.walmart.ca/en/grocery/dairy-eggs/N-3798',
                               'https://www.walmart.ca/en/grocery/meat-seafood/N-3793',
                               'https://www.walmart.ca/en/grocery/pantry-food/N-3794',
@@ -44,8 +44,9 @@ class server_walmart:
                               'https://www.walmart.ca/en/grocery/deli-ready-made-meals/N-3792',
                               'https://www.walmart.ca/en/grocery/bakery/N-3796',
                               'https://www.walmart.ca/en/grocery/drinks/N-3791',
-                              'https://www.walmart.ca/en/grocery/natural-organic-food/N-3992']"""
-        self.category_urls = ['https://www.walmart.ca/en/grocery/fruits-vegetables/N-3799'] # for testing
+                              ]
+        #self.category_urls = ['https://www.walmart.ca/en/grocery/natural-organic-food/N-3992']
+        #self.category_urls = ['https://www.walmart.ca/en/grocery/fruits-vegetables/N-3799'] # for testing
 
         self.data = database.DatabaseObj("localhost", "readwrite", "readwrite", databasename='grocerygo',
                                          write_access=True)

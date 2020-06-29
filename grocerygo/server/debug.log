@@ -3,3 +3,15 @@
 [0614/023532.847:ERROR:registration_protocol_win.cc(131)] TransactNamedPipe: The pipe has been ended. (0x6D)
 [0614/023532.848:ERROR:file_io.cc(89)] ReadExactly: expected 40, observed 0
 [0614/023538.471:ERROR:crashpad_client_win.cc(508)] CreateProcess: The paging file is too small for this operation to complete. (0x5AF)
+[0629/144647.206:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0629/164445.263:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0629/165129.410:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
+[0629/165232.098:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
+[0629/165250.974:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
+[0629/165304.346:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
+[0629/165315.256:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0629/165319.162:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
+[0629/165404.595:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
+[0629/165418.348:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
+[0629/165448.457:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
+[0629/165455.067:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports

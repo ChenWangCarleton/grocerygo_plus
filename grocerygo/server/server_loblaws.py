@@ -27,8 +27,8 @@ class Server_Loblaws():
         self.current_running_thread = 0
         self.current_running_thread_lock = threading.Lock()
         # https://stackoverflow.com/questions/35088139/how-to-make-a-thread-safe-global-counter-in-python
-        self.loblaws_initial_page = 'https://www.loblaws.ca/Food/Ready-Made-Meals/c/LSL001002000000'#'https://www.loblaws.ca/Food/c/LSL001000000000?navid=flyout-L2-Food'
-
+        #self.loblaws_initial_page = 'https://www.loblaws.ca/Food/Ready-Made-Meals/c/LSL001002000000'#'https://www.loblaws.ca/Food/c/LSL001000000000?navid=flyout-L2-Food'
+        self.loblaws_initial_page = 'https://www.loblaws.ca/Food/c/LSL001000000000'
         self.data = DatabaseObj("localhost", "readwrite", "readwrite", databasename='grocerygo', write_access=True)
 
         # These two booleans are used to show if the server is getting link or getting price. They are for restricting server from starting new similiar tasks when there are current task running
@@ -154,7 +154,10 @@ class Server_Loblaws():
             self.get_link_result_list.pop(0)
         self.writting_links_to_db = False
         return True
-
+    def give_up_thread(self):
+        logger.debug('giving up running thread')
+        self.current_running_thread = 0
+        return True
     def force_reset(self):
         logger.info('force reseting Server_Loblaws instance')
         if self.getting_links or self.getting_price:
@@ -175,10 +178,10 @@ class Server_Loblaws():
         self.get_server_status()
 
     def start_writting_links(self, iswritting=True):
-        if self.getting_links or self.getting_price:
+        """if self.getting_links or self.getting_price:
             logger.info('Server is getting itempages links, please check back latter')
-            return False
-        elif len(self.get_link_result_list) == 0:
+            return False"""
+        if len(self.get_link_result_list) == 0:
             logger.info('No link to be wrote into database')
             return False
         elif self.writting_links_to_db or self.writting_prices_to_db:
@@ -188,10 +191,11 @@ class Server_Loblaws():
         threading.Thread(target=self.write_link_to_db).start()
         return True
     def start_writting_price(self, iswritting=True):
-        if self.getting_links or self.getting_price:
+        """if self.getting_links or self.getting_price:
             logger.info('Server is getting itempages links, please check back latter')
             return False
-        elif len(self.get_price_result_list) == 0:
+        el"""
+        if len(self.get_price_result_list) == 0:
             logger.info('No price to be wrote into database')
             return False
         elif self.writting_links_to_db or self.writting_prices_to_db:
@@ -232,8 +236,8 @@ class Server_Loblaws():
                      'current {} thread for get item detail, getting_item_detail:{}, current {} in item_detail_result_tuple_list'.format(self.getting_links,
                                                                            self.get_link_loblaws_tuple_queue.qsize(),
                                                                            self.current_running_thread,
-                                                                           len(self.get_link_result_list),
-                                                                           len(self.get_link_failed_list),total_item_link,
+                                                                           len(self.get_link_result_list),total_item_link,
+                                                                           len(self.get_link_failed_list),
                                                                            len(self.get_price_result_list),
                                                                            len(self.get_price_failed_list),
                                                                         self.getting_links, self.getting_price, self.writting_links_to_db, self.writting_prices_to_db,

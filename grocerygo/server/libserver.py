@@ -29,7 +29,8 @@ loblaws_server_dict = {
     'initial_detail': loblaws_server.start_getting_item_detail,
     'detail_list': loblaws_server.get_id_url_tuple_list,
     'detail_failed': loblaws_server.get_failed_item_detail_tuple_list,
-    'retry_detail': loblaws_server.retry_failed_get_item_detail
+    'retry_detail': loblaws_server.retry_failed_get_item_detail,
+    'give_up_thread': loblaws_server.give_up_thread
 
 }
 class Message:

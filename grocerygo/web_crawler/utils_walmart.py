@@ -161,7 +161,12 @@ def get_item_link(driver):
         WebDriverWait(driver, 10).until(element_present)
         pagination = driver.find_element_by_id('shelf-sort-count')
 
-        current_page_items = int(pagination.find_element_by_class_name('last-rec-num').text)
+        #ValueError: invalid literal for int() with base 10: ''
+        current_page_items=pagination.find_element_by_class_name('last-rec-num').text
+        if current_page_items == '':
+            current_page_items = pagination.find_element_by_class_name('last-rec-num').get_attribute('innerText')
+        current_page_items = int(current_page_items)
+        #current_page_items = int(pagination.find_element_by_class_name('last-rec-num').text)
         current_page_items = current_page_items % 60 # had a really weird bug so that this seem to be the only way to get correct item count
         if current_page_items == 0:
             current_page_items = 60
