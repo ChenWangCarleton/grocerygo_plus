@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Grocerygo</string>
+    <string name="LoginButton">Sign in/ Sign up</string>
+    <string name="MyGroceryListButton">My Grocery List</string>
+
+    <string name="all_filter">All</string>
+    <string name="loblaws_filter">Loblaws</string>
+    <string name="metro_filter">Metro</string>
+    <string name="Walmart_filter">Walmart</string>
+    <string name="categoryButton1"><![CDATA[Fruits & Vegetables]]></string>
+    <string name="categoryButton2">Drinks</string>
+    <string name="categoryButton3"><![CDATA[Deli & Ready Made Meals]]></string>
+    <string name="categoryButton4">Bakery</string>
+    <string name="categoryButton5"><![CDATA[Dairy & Eggs]]></string>
+    <string name="categoryButton6">Pantry</string>
+    <string name="categoryButton7"><![CDATA[Meat & Seafood]]></string>
+    <string name="categoryButton8">Frozen</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+</resources>

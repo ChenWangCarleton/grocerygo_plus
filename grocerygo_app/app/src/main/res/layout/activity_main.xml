@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <SearchView
+        android:id="@+id/search_main"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/filterGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_main"
+        app:singleLine="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/all_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/all_filter"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/loblaws_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/loblaws_filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/metro_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/metro_filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/walmart_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/Walmart_filter" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <LinearLayout
+        android:id="@+id/main_button_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="116dp"
+        android:gravity="center_horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/MyGroceryListButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:contentDescription="@string/MyGroceryListButton"
+            app:layout_constraintEnd_toStartOf="@+id/LoginButton"
+            app:srcCompat="@android:drawable/ic_menu_agenda"
+            tools:layout_editor_absoluteY="433dp" />
+
+        <ImageButton
+            android:id="@+id/LoginButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:contentDescription="@string/LoginButton"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/MyGroceryListButton"
+            app:srcCompat="@android:drawable/ic_menu_myplaces" />
+    </LinearLayout>
+
+    <GridLayout
+        android:id="@+id/GridLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:orientation="horizontal"
+        android:rowCount="4"
+        app:layout_constraintBottom_toTopOf="@+id/main_button_group"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/filterGroup"
+        app:layout_constraintVertical_bias="0.346"
+        tools:context=".GridXMLActivity">
+
+        <Button
+            android:id="@+id/categoryButton1"
+            android:layout_gravity="start"
+            android:layout_margin="10dp"
+            android:text="@string/categoryButton1" />
+
+        <Button
+            android:id="@+id/categoryButton2"
+            android:layout_gravity="start"
+            android:layout_margin="10dp"
+            android:text="@string/categoryButton2" />
+
+        <Button
+            android:id="@+id/categoryButton3"
+            android:layout_gravity="start"
+            android:layout_margin="10dp"
+            android:text="@string/categoryButton3" />
+
+        <Button
+            android:id="@+id/categoryButton4"
+            android:layout_gravity="start"
+            android:layout_margin="10dp"
+            android:text="@string/categoryButton4" />
+
+        <Button
+            android:id="@+id/categoryButton5"
+            android:layout_gravity="start"
+            android:layout_margin="10dp"
+            android:text="@string/categoryButton5" />
+
+        <Button
+            android:id="@+id/categoryButton6"
+            android:layout_gravity="start"
+            android:layout_margin="10dp"
+            android:text="@string/categoryButton6" />
+
+        <Button
+            android:id="@+id/categoryButton7"
+            android:layout_gravity="start"
+            android:layout_margin="10dp"
+            android:text="@string/categoryButton7" />
+
+        <Button
+            android:id="@+id/categoryButton8"
+            android:layout_gravity="start"
+            android:layout_margin="10dp"
+            android:text="@string/categoryButton8" />
+    </GridLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
