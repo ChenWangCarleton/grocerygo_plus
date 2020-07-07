@@ -36,7 +36,7 @@ class server_walmart:
                                                       'img_src'],
                                              'item_price': ['item_id', 'daily_id', 'price']}
 
-        self.category_urls = ['https://www.walmart.ca/en/grocery/fruits-vegetables/N-3799',
+        """self.category_urls = ['https://www.walmart.ca/en/grocery/fruits-vegetables/N-3799',
                               'https://www.walmart.ca/en/grocery/dairy-eggs/N-3798',
                               'https://www.walmart.ca/en/grocery/meat-seafood/N-3793',
                               'https://www.walmart.ca/en/grocery/pantry-food/N-3794',
@@ -44,7 +44,8 @@ class server_walmart:
                               'https://www.walmart.ca/en/grocery/deli-ready-made-meals/N-3792',
                               'https://www.walmart.ca/en/grocery/bakery/N-3796',
                               'https://www.walmart.ca/en/grocery/drinks/N-3791',
-                              ]
+                              ]"""
+        self.category_urls =['https://www.walmart.ca/en/grocery/pantry-food/spreads-syrups/cheese-specialty-spreads/N-3905', 'https://www.walmart.ca/en/grocery/pantry-food/canned-food/canned-vegetables/N-3777', 'https://www.walmart.ca/en/grocery/pantry-food/chips-snacks/cookies/N-3912', 'https://www.walmart.ca/en/grocery/pantry-food/oils-vinegars/cider-wine-vinegar/N-4344']
         #self.category_urls = ['https://www.walmart.ca/en/grocery/natural-organic-food/N-3992']
         #self.category_urls = ['https://www.walmart.ca/en/grocery/fruits-vegetables/N-3799'] # for testing
 
@@ -276,19 +277,25 @@ class server_walmart:
                 price = record[2]
 
                 # get item id
-                item_id = self.data.select_from_table('item_url', "url='{}'".format(item_url), 'item_id')
-                if len(item_id) == 0:
-                    # insert it into item_url table first if the url doesn't exist in it
+                """ had issue Process finished with exit code -1073740940 (0xC0000374)
+                Assuming it's caused by massive select at the same time according to https://github.com/USGS-Astrogeology/PyHAT_Point_Spectra_GUI/issues/38
+                trying with adding thread lock"""
 
-                    attribute_tuple_list = [(item_url, brand, category_list[1])]
-                    respond = self.data.execute_insert('item_url',
-                                                       columnnames=self.tablename_attributelist_dict['item_url'],
-                                                       attributes=attribute_tuple_list)
-                    if not respond:
-                        logger.error('error happened when inserting item into item_url table url:{} '.format(item_url))
-                        self.failed_list.append(url)
-                        return False
+                with self.thread_lock:
                     item_id = self.data.select_from_table('item_url', "url='{}'".format(item_url), 'item_id')
+                    if len(item_id) == 0:
+                        # insert it into item_url table first if the url doesn't exist in it
+
+                        attribute_tuple_list = [(item_url, brand, category_list[1])]
+                        respond = self.data.execute_insert('item_url',
+                                                           columnnames=self.tablename_attributelist_dict['item_url'],
+                                                           attributes=attribute_tuple_list)
+                        if not respond:
+                            logger.error('error happened when inserting item into item_url table url:{} '.format(item_url))
+                            self.failed_list.append(url)
+                            return False
+
+                        item_id = self.data.select_from_table('item_url', "url='{}'".format(item_url), 'item_id')
                 if len(item_id) != 1:
                     logger.error('error when getting id for item {}, terminating the writing process now, '
                                  'please try again once the database issue is fixed'.format(item_url))

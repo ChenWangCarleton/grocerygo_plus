@@ -4,8 +4,8 @@ import selectors
 import traceback
 
 #import libserver  # for loblaws
-import walmart_libserver as libserver # for walmart
-#import metro_libserver as libserver # for metro
+#import walmart_libserver as libserver # for walmart
+import metro_libserver as libserver # for metro
 sel = selectors.DefaultSelector()
 
 

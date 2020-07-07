@@ -252,7 +252,10 @@ def get_item_link_price(driver):
                 current_price = element.find_element_by_class_name('price-current').text
             except NoSuchElementException:
                 current_price = element.find_element_by_css_selector('.price-current.width-adjusted').text
-            assert current_price # make sure price is not empty
+            #assert current_price # make sure price is not empty
+            if not current_price: # yes, there are items that do not have a price!
+                #https://www.walmart.ca/en/ip/colussi-caffelatte-biscuits/6000068462550
+                url_category_price_tuple_list.append((url, category_list.copy(), 'price not available'))
             price_unit_description = element.find_element_by_class_name('description').text
             if price_unit_description:
                 current_price = current_price + '/' + price_unit_description
@@ -426,6 +429,10 @@ def get_all_category_price(url, headless=False, disableimage=False):
         while True:
 
             current_page_result = get_item_link_price(driver)
+            if current_page_result is None:
+                logger.error('unexpected error when get_item_link_price with id_url_tuple:{}\n'.format(url, traceback.format_exc()))
+                return None
+
             for result in current_page_result:
                 result_list.append(result)
             if not click_next_page(driver):

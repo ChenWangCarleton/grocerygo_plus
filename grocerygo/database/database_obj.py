@@ -59,6 +59,29 @@ class DatabaseObj:
         return self.insert_update(sql_statement,kwargs['attributes'])
 
 
+    def execute_insert_update(self,  table_name, **kwargs):
+        # expecting  columnnames (string list), types (string list), attributes (tuple list)in kwargs
+        # expecting  columnnames (string list), types (string list), attributes (tuple list)in kwargs
+        try:
+            assert len(kwargs['columnnames']) == len(kwargs['attributes'][0])
+
+            assert len(kwargs['columnnames']) > 0
+            for i in kwargs['attributes']:
+                assert len(i) == len(kwargs['attributes'][0])
+            assert len(kwargs['to_update']) > 0
+        except:
+            logger.error('error when executing insert statement\nkwargs:\n{}\n{}'.format(kwargs,traceback.format_exc()))
+            return False
+        column_num = len(kwargs['columnnames'])
+        sql_statement = 'INSERT INTO {} ({}) VALUES ({}) ON DUPLICATE KEY UPDATE {}'.format(table_name,
+                                                                 ','.join(kwargs['columnnames']),
+                                                                 ','.join(['%s' for i in range(column_num)]),
+                                                                                            ','.join(kwargs['to_update']))
+        logger.info(sql_statement)
+        # print(sql_statement)
+
+        return self.insert_update(sql_statement, kwargs['attributes'])
+
     def execute_update(self, table_name, where_constraint, **kwargs):
         # expecting  columnnames (string list), types (string list), attributes (tuple list)in kwargs
         # expecting where_constraint(string) to start with either where or the constraint, not null

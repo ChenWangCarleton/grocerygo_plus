@@ -37,8 +37,12 @@ class server_metro:
                                              'item': ['item_id', 'name', 'brand', 'description', 'ingredient',
                                                       'img_src'],
                                              'item_price': ['item_id', 'daily_id', 'price']}
+        self.tablename_to_update_dict = {'item_url': ['source_brand=VALUES(source_brand)', 'category=VALUES(category)'],
+                                         'item': ['name=VALUES(name)', 'brand=VALUES(brand)', 'description=VALUES(description)', 'ingredient=VALUES(ingredient)',
+                                                      'img_src=VALUES(img_src)'],
+                                            'item_price': ['price=VALUES(price)']}
 
-        """self.category_urls = ['https://www.metro.ca/en/online-grocery/aisles/fruits-vegetables',
+        self.category_urls = ['https://www.metro.ca/en/online-grocery/aisles/fruits-vegetables',
                               'https://www.metro.ca/en/online-grocery/aisles/dairy-eggs',
                               'https://www.metro.ca/en/online-grocery/aisles/pantry',
                               'https://www.metro.ca/en/online-grocery/aisles/beverages',
@@ -49,10 +53,10 @@ class server_metro:
                               'https://www.metro.ca/en/online-grocery/aisles/bread-bakery-products',
                               'https://www.metro.ca/en/online-grocery/aisles/deli-prepared-meals',
                               'https://www.metro.ca/en/online-grocery/aisles/fish-seafood',
-                              ]"""
-        self.category_urls = ['https://www.metro.ca/en/online-grocery/aisles/fruits-vegetables',
+                              ]
+        """self.category_urls = ['https://www.metro.ca/en/online-grocery/aisles/fruits-vegetables',
                               'https://www.metro.ca/en/online-grocery/aisles/dairy-eggs',
-                              'https://www.metro.ca/en/online-grocery/aisles/pantry']
+                              'https://www.metro.ca/en/online-grocery/aisles/pantry']"""
 
         self.data = database.DatabaseObj("localhost", "readwrite", "readwrite", databasename='grocerygo',
                                          write_access=True)
@@ -110,9 +114,10 @@ class server_metro:
                 'talbe name does not exist in table dictionary. table name: {}\ndictionary:{}\n{}'.format(
                     table_name, self.tablename_attributelist_dict, traceback.format_exc()))
             return False
-        respond = self.data.execute_insert(table_name,
-                                           columnnames=self.tablename_attributelist_dict[table_name],
-                                           attributes=attribute_tuple_list)
+        respond = self.data.execute_insert_update(table_name,
+                                               columnnames=self.tablename_attributelist_dict[table_name],
+                                               attributes=attribute_tuple_list,
+                                               to_update=self.tablename_to_update_dict[table_name])
         if not respond:
             logger.error('error when writting into database, terminating the writing process now, '
                          'please try again once the database issue is fixed\n{}'.format(traceback.format_exc()))
@@ -260,7 +265,6 @@ class server_metro:
                     self.failed_list.append(url)
                     return False
                 item_id = item_id[0][0]
-
                 attribute_tuple_list = (item_id, name, item_brand, description, ingredient, img_src)
                 self.to_be_written_to_db.append(attribute_tuple_list)
             logger.debug('total {} items link added to to_be_written_to_db list from url {}')

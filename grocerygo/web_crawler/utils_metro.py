@@ -297,11 +297,14 @@ def get_item_detail(url, headless=False,disableimage=False):
                     time.sleep(1)
                     #print('current:', current_url, '\nnext_url:', driver.current_url)
                     loop_lasted_time = int(time.time()) - loop_starting_time
-                    if loop_lasted_time % 10 == 0: # click again in case no response
-                        if current_url == next_button.get_attribute('href'):
-                            logger.debug('clicked again when current url is: {}'.format(current_url))
-                            next_button.click()
-                    if loop_lasted_time > 60:
+                    if loop_lasted_time % 30 == 0: # click again in case no response
+                        pagination_element = driver.find_element_by_class_name('ppn--pagination')
+                        next_button = pagination_element.find_elements_by_tag_name('a')[1]
+                        if 'disabled' not in next_button.get_attribute('class'):
+                            if current_url == next_button.get_attribute('href'):
+                                logger.debug('clicked again when current url is: {}'.format(current_url))
+                                next_button.click()
+                    if loop_lasted_time > 75:
                         logger.error('for url:{}\ncurrent url:{}\nhas been stucked for 60 seconds, returning the current url for future restart'.format(url, current_url))
                         return current_url, item_detail_tuple_list
         return True, item_detail_tuple_list

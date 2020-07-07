@@ -15,3 +15,27 @@
 [0629/165418.348:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
 [0629/165448.457:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
 [0629/165455.067:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports
+[0629/192849.638:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0629/194320.663:ERROR:process_info.cc(359)] UncheckedAllocate
+[0629/194320.960:ERROR:process_info.cc(359)] UncheckedAllocate
+[0629/194321.444:ERROR:filesystem_win.cc(148)] DeleteFile C:\Users\natsu\AppData\Local\Temp\scoped_dir54364_1793646961\Crashpad\reports\d7565b03-1b8a-486f-ba63-685b4276f42e.dmp: The process cannot access the file because it is being used by another process. (0x20)
+[0629/194321.575:ERROR:filesystem_win.cc(148)] DeleteFile C:\Users\natsu\AppData\Local\Temp\scoped_dir38120_607006378\Crashpad\reports\3c02d99d-310f-4b6f-8bf2-c4de51fac709.dmp: The process cannot access the file because it is being used by another process. (0x20)
+[0629/194321.579:ERROR:filesystem_win.cc(148)] DeleteFile C:\Users\natsu\AppData\Local\Temp\scoped_dir46176_750712198\Crashpad\reports\d051b664-c0bd-4494-85a4-c5dbf39f9184.dmp: The process cannot access the file because it is being used by another process. (0x20)
+[0629/202412.972:ERROR:process_info.cc(359)] UncheckedAllocate
+[0629/202413.481:ERROR:process_info.cc(359)] UncheckedAllocate
+[0629/202415.357:ERROR:process_info.cc(359)] UncheckedAllocate
+[0629/202415.680:ERROR:filesystem_win.cc(148)] DeleteFile C:\Users\natsu\AppData\Local\Temp\scoped_dir36708_1894114986\Crashpad\reports\8d70f106-dd86-4fe4-832e-075d975e11a2.dmp: The process cannot access the file because it is being used by another process. (0x20)
+[0629/202423.535:ERROR:filesystem_win.cc(148)] DeleteFile C:\Users\natsu\AppData\Local\Temp\scoped_dir66084_759067421\Crashpad\reports\0a6349ee-341c-41a8-baca-e50640cefc24.dmp: The process cannot access the file because it is being used by another process. (0x20)
+[0630/032728.064:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/033401.093:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/035720.897:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/040107.072:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/044351.951:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/045810.390:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/050108.974:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/050959.731:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/052129.057:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/053101.959:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0630/053101.967:ERROR:exception_snapshot_win.cc(98)] thread ID 84412 not found in process
+[0630/053525.441:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
+[0630/061150.682:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
