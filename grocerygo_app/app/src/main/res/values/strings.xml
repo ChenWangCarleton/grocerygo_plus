@@ -24,4 +24,7 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="SubmitTag">Submit Tag</string>
+    <string name="tag_submit_field">Input Tag here</string>
+    <string name="get_price_button">get Price</string>
 </resources>

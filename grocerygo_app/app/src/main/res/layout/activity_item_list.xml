@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".item_list">
+    <SearchView
+        android:id="@+id/search_main"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/filterGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_main"
+        app:singleLine="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/all_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/all_filter"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/loblaws_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/loblaws_filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/metro_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/metro_filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/walmart_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/Walmart_filter" />
+    </com.google.android.material.chip.ChipGroup>
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+
+
+        android:descendantFocusability="blocksDescendants"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/filterGroup" />
+</androidx.constraintlayout.widget.ConstraintLayout>
