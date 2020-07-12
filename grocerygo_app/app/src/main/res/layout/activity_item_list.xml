@@ -33,26 +33,35 @@
             android:id="@+id/all_chip"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:checkable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:text="@string/all_filter"/>
 
         <com.google.android.material.chip.Chip
             android:id="@+id/loblaws_chip"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:checkable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:text="@string/loblaws_filter" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/metro_chip"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:checkable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:text="@string/metro_filter" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/walmart_chip"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:checkable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:text="@string/Walmart_filter" />
     </com.google.android.material.chip.ChipGroup>
+
     <ListView
         android:id="@+id/listview"
         android:layout_width="0dp"
@@ -62,6 +71,8 @@
         android:descendantFocusability="blocksDescendants"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/filterGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/filterGroup"
+        app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

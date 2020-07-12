@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 
 import java.io.Serializable;
@@ -16,11 +17,21 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     SearchView main_search_view;
     Button button1;
+    Button button2;
+    Button button3;
+    Button button4;
+    Button button5;
+    Button button6;
+    Button button7;
+    Button button8;
+    ImageButton shoppingListButton;
 
 
-    ArrayList<Item>  items=new ArrayList<>();
+    public static ArrayList<Item>  items=new ArrayList<>();
     Map<String, String> source_brand_map = new HashMap<String, String>();
     Map<String, String> category_map = new HashMap<String, String>();
+    public static GroceryGoDatabase ggDB;
+    CategoryButtonClickListener categoryButtonClickListener = new CategoryButtonClickListener();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,24 +39,59 @@ public class MainActivity extends AppCompatActivity {
 
 
         new Initialization().start();// initialize
+        ggDB = new GroceryGoDatabase(this);
 
         main_search_view = (SearchView) findViewById(R.id.search_main);
-        button1 = (Button) findViewById(R.id.categoryButton1);
-
-        button1.setOnClickListener(new View.OnClickListener(){
+        shoppingListButton = (ImageButton) findViewById(R.id.MyGroceryListButton);
+        shoppingListButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Button b1 = (Button)view;
-                Intent intent = new Intent(view.getContext(), DisplayItemListActivity.class);
-                intent.putExtra("button_text", b1.getText().toString());
-                intent.putExtra("item_list", (Serializable) items);
-
+                Intent intent = new Intent(view.getContext(), my_cart.class);
                 startActivity(intent);
 
             }
         });
-    }
 
+        button1 = (Button) findViewById(R.id.categoryButton1);
+        button1.setOnClickListener(categoryButtonClickListener);
+        button2 = (Button) findViewById(R.id.categoryButton2);
+        button2.setOnClickListener(categoryButtonClickListener);
+        button3 = (Button) findViewById(R.id.categoryButton3);
+        button3.setOnClickListener(categoryButtonClickListener);
+        button4 = (Button) findViewById(R.id.categoryButton4);
+        button4.setOnClickListener(categoryButtonClickListener);
+        button5 = (Button) findViewById(R.id.categoryButton5);
+        button5.setOnClickListener(categoryButtonClickListener);
+        button6 = (Button) findViewById(R.id.categoryButton6);
+        button6.setOnClickListener(categoryButtonClickListener);
+        button7 = (Button) findViewById(R.id.categoryButton7);
+        button7.setOnClickListener(categoryButtonClickListener);
+        button8 = (Button) findViewById(R.id.categoryButton8);
+        button8.setOnClickListener(categoryButtonClickListener);
+    }
+    public ArrayList<Item> filterByCategory(String category){
+        ArrayList<Item> result = new ArrayList<>();
+        for(int x=0;x<items.size();x++){
+            if (items.get(x).getItem_category().equals(category_map.get(category))){
+                result.add(items.get(x));
+            }
+        }
+        return result;
+    }
+    class CategoryButtonClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+            Button b1 = (Button)v;
+            Intent intent = new Intent(v.getContext(), DisplayItemListActivity.class);
+            intent.putExtra("button_text", b1.getText().toString());
+            intent.putExtra("item_list", (Serializable) filterByCategory(b1.getText().toString()));
+
+            startActivity(intent);
+        }
+
+    }
     class Initialization extends Thread{
 
         public void run(){
@@ -78,8 +124,23 @@ public class MainActivity extends AppCompatActivity {
             source_brand_map.put("1","Walmart");
             source_brand_map.put("2","Metro");
 
-
-            category_map.put("0","Fruits & Vegetables");
+            category_map.put("0",getString(R.string.categoryButton1));
+            category_map.put("1",getString(R.string.categoryButton2));
+            category_map.put("2",getString(R.string.categoryButton3));
+            category_map.put("3",getString(R.string.categoryButton4));
+            category_map.put("4",getString(R.string.categoryButton5));
+            category_map.put("5",getString(R.string.categoryButton6));
+            category_map.put("6",getString(R.string.categoryButton7));
+            category_map.put("7",getString(R.string.categoryButton8));
+            category_map.put(getString(R.string.categoryButton1),"0");
+            category_map.put(getString(R.string.categoryButton2),"1");
+            category_map.put(getString(R.string.categoryButton3),"2");
+            category_map.put(getString(R.string.categoryButton4),"3");
+            category_map.put(getString(R.string.categoryButton5),"4");
+            category_map.put(getString(R.string.categoryButton6),"5");
+            category_map.put(getString(R.string.categoryButton7),"6");
+            category_map.put(getString(R.string.categoryButton8),"7");
+            /*category_map.put("0","Fruits & Vegetables");
             category_map.put("1","Drinks");
             category_map.put("2","Deli & Ready Made Meals");
             category_map.put("3","Bakery");
@@ -87,6 +148,14 @@ public class MainActivity extends AppCompatActivity {
             category_map.put("5","Pantry");
             category_map.put("6","Meat & Seafood");
             category_map.put("7","Frozen");
+            category_map.put("Fruits & Vegetables","0");
+            category_map.put("Drinks","1");
+            category_map.put("Deli & Ready Made Meals","2");
+            category_map.put("Bakery","3");
+            category_map.put("Dairy & Eggs","4");
+            category_map.put("Pantry","5");
+            category_map.put("Meat & Seafood","6");
+            category_map.put("Frozen","7");*/
             for(int x =0; x<items.size(); x++){
                 System.out.println(items.get(x).toString());
             }

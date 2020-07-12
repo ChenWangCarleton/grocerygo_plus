@@ -29,9 +29,16 @@ import java.util.ArrayList;
 
 public class CustomListview extends ArrayAdapter<Item> implements Filterable {
     Activity context;
+
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+
     ArrayList<Item> items;
     ArrayList<Item> forFilter;
+    ArrayList<Item> originalItems;
     private CustomeFilter customeFilter;
+    private ChipGroupFilter chipGroupFilter;
 
     public CustomeFilter getCustomeFilter() {
         if(customeFilter==null){
@@ -40,12 +47,21 @@ public class CustomListview extends ArrayAdapter<Item> implements Filterable {
         return customeFilter;
     }
 
+    public ChipGroupFilter getChipGroupFilter(){
+        if(chipGroupFilter==null){
+            chipGroupFilter=new ChipGroupFilter();
+        }
+        return chipGroupFilter;
+
+    }
+
     public CustomListview(Activity context, ArrayList<Item> pro) {
         super(context, R.layout.activity_item_list_element,pro );
 
         this.context=context;
         this.items= pro;
         this.forFilter=pro;
+        this.originalItems=pro;
     }
 
     @NonNull
@@ -76,6 +92,49 @@ public class CustomListview extends ArrayAdapter<Item> implements Filterable {
 
     }
 
+    public ArrayList<Item> filterBySourceBrand(String source_brand){
+        ArrayList<Item> result = new ArrayList<>();
+        for(int x = 0; x<originalItems.size();x++){
+            if(originalItems.get(x).getSource_brand().equals(source_brand)){
+                Item p=new Item(originalItems.get(x));
+                result.add(p);
+            }
+        }
+        return result;
+    }
+
+    class ChipGroupFilter extends Filter{
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint){
+            String chipFilterSelection = constraint.toString();
+            FilterResults results=new FilterResults();
+            if (chipFilterSelection.charAt(3) == '1'){
+                forFilter = new ArrayList<Item>(originalItems);
+            } else if(chipFilterSelection.substring(0,3).equals("000")){
+                forFilter = new ArrayList<Item>(originalItems);
+            } else{
+                forFilter = new ArrayList<Item>();
+                for(int x = 0; x<3;x++){
+                    if(chipFilterSelection.charAt(x) == '1'){
+                        ArrayList<Item> result = filterBySourceBrand(String.valueOf(x));
+                        for(int y=0;y<result.size();y++){
+                            forFilter.add(result.get(y));
+                        }
+                    }
+                }
+            }
+
+            results.count=forFilter.size();
+            results.values=forFilter;
+            return results;
+        }
+        @Override
+        protected  void publishResults(CharSequence constraint, FilterResults results){
+            items=(ArrayList<Item>)results.values;
+            notifyDataSetChanged();
+        }
+
+    }
     class CustomeFilter extends Filter{
         @Override
         protected FilterResults performFiltering(CharSequence constraint){

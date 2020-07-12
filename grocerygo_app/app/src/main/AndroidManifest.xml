@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".item_list_element"></activity>
         <activity android:name=".my_cart" />
-        <activity android:name=".item_detail" />
+        <activity android:name=".item_detailActivity" />
         <activity android:name=".item_list" />
         <activity
             android:name=".ui.login.LoginActivity"
@@ -28,6 +28,8 @@
             android:configChanges = "orientation"
             android:screenOrientation = "portrait">
         </activity>
+
+
     </application>
 
 </manifest>
