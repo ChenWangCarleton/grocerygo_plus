@@ -24,15 +24,15 @@ hard_code = [[[] for j in range(8)] for i in range(3)]
 print(len(sample_data))
 print(len(sample_data[0]))
 
-max_data = 2
+#max_data = 2
 
 for record in result:
     if record[2] in category_dict:
         source_brand_index = source_brand_dict[record[4]]
         category_index = category_dict[record[2]]
-        if len(sample_data[source_brand_index][category_index]) < max_data:
-            hard_code[source_brand_index][category_index].append([str(record[0]),record[1],str(category_index),str(record[3]), str(source_brand_index),record[5]])
-            sample_data[source_brand_index][category_index].append({'item_id':str(record[0]),'item_name':record[1],'category':str(category_index),'item_brand':str(record[3]),'source_brand':str(source_brand_index),'img_src':record[5]})
+        #if len(sample_data[source_brand_index][category_index]) < max_data:
+        hard_code[source_brand_index][category_index].append([str(record[0]),record[1],str(category_index),str(record[3]), str(source_brand_index),record[5]])
+        sample_data[source_brand_index][category_index].append({'item_id':str(record[0]),'item_name':record[1],'category':str(category_index),'item_brand':str(record[3]),'source_brand':str(source_brand_index),'img_src':record[5]})
 mixed = []
 for i in sample_data:
     for j in i:
@@ -40,9 +40,9 @@ for i in sample_data:
             mixed.append(k)
 print(len(mixed))
 x=json.dumps(mixed)
-print(x)
-y = json.loads(x)
-print(y)
+#print(x)
+"""y = json.loads(x)
+print(y)"""
 #products.add(new Product(id.get(x),titles.get(x),body.get(x),vendor.get(x),types.get(x),created.get(x),handle.get(x),updated.get(x),at.get(x),suffix.get(x),scope.get(x),tags.get(x),imgURL.get(x)));
 """print("ArrayList<Item>  items=new ArrayList<>();")
 for i in hard_code:

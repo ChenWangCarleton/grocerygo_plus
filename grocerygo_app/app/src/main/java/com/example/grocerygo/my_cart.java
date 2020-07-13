@@ -43,24 +43,7 @@ public class my_cart extends AppCompatActivity {
     }
 
     public void get_shopping_list_items(){
-        ArrayList<String> item_ids = MainActivity.ggDB.allItems();
-        Collections.sort(item_ids, new Comparator<String>() {
-            @Override
-            public int compare(String lhs, String rhs) {
-                // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
-                return Integer.parseInt(lhs) > Integer.parseInt(rhs) ? -1 : (Integer.parseInt(lhs) < Integer.parseInt(rhs)) ? 1 : 0;
-            }
-        });
-        System.out.println("after sort: "+item_ids.toString());
-
-        for(int x=0;x<item_ids.size();x++){
-            for(int y=0;y<MainActivity.items.size();y++){
-                if (MainActivity.items.get(y).getItem_id().equals(item_ids.get(x))){
-                    items.add(MainActivity.items.get(y));
-                    break;
-                }
-            }
-        }
+        items = MainActivity.ggDB.allItems();
 
     }
 }

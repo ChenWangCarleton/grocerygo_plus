@@ -35,7 +35,8 @@ public class DisplayItemListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_item_list);
         Intent intent = getIntent();
         button_text = intent.getStringExtra("button_text");
-        items = (ArrayList<Item>) intent.getSerializableExtra("item_list");
+        //items = (ArrayList<Item>) intent.getSerializableExtra("item_list");
+        items = MainActivity.ggDB.getByCategory(button_text);
         //final CustomListview customListview = new CustomListview(this, items);
         customListview = new CustomListview(this, items);
         list_view = (ListView) findViewById(R.id.listview);

@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     ImageButton shoppingListButton;
 
 
-    public static ArrayList<Item>  items=new ArrayList<>();
+    //public static ArrayList<Item>  items=new ArrayList<>();
     Map<String, String> source_brand_map = new HashMap<String, String>();
     Map<String, String> category_map = new HashMap<String, String>();
     public static GroceryGoDatabase ggDB;
@@ -70,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
         button7.setOnClickListener(categoryButtonClickListener);
         button8 = (Button) findViewById(R.id.categoryButton8);
         button8.setOnClickListener(categoryButtonClickListener);
-
+        //ggDB.onetime();
     }
-    public ArrayList<Item> filterByCategory(String category){
+   /* public ArrayList<Item> filterByCategory(String category){
         ArrayList<Item> result = new ArrayList<>();
         for(int x=0;x<items.size();x++){
             if (items.get(x).getItem_category().equals(category_map.get(category))){
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return result;
-    }
+    }*/
     class CategoryButtonClickListener implements View.OnClickListener {
 
         @Override
@@ -88,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
 
             Button b1 = (Button)v;
             Intent intent = new Intent(v.getContext(), DisplayItemListActivity.class);
-            intent.putExtra("button_text", b1.getText().toString());
-            intent.putExtra("item_list", (Serializable) filterByCategory(b1.getText().toString()));
+            intent.putExtra("button_text", category_map.get(b1.getText().toString()));
+            //intent.putExtra("item_list", (Serializable) filterByCategory(b1.getText().toString()));
 
             startActivity(intent);
         }
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     class Initialization extends Thread{
 
         public void run(){
-            items.add(new Item("527","Organic Honeydew Melon","0","None","0","https://assets.shop.loblaws.ca/products_jpeg/20289708001/en/20289708001_lrg_1_@1x.jpg"));
+            /*items.add(new Item("527","Organic Honeydew Melon","0","None","0","https://assets.shop.loblaws.ca/products_jpeg/20289708001/en/20289708001_lrg_1_@1x.jpg"));
             items.add(new Item("1430","Café blanc 3-en-1","1","None","0","https://assets.shop.loblaws.ca/products_jpeg/21094512/en/21094512_lrg_1_@1x.jpg"));
             items.add(new Item("6774","1/4 Rotisserie Chicken Dark Meat","2","None","0","https://assets.shop.loblaws.ca/products_jpeg/20116090/en/20116090_lrg_1_@1x.jpg"));
             items.add(new Item("4365","Ace Cheddar Onion Demi Baguette","3","ACE","0","https://assets.shop.loblaws.ca/products_jpeg/21018897/en/21018897_lrg_1_@1x.jpg"));
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             items.add(new Item("49552","Large Eggs","4","SELECTION","2","https://product-images.metro.ca/images/h3e/h65/9398467985438.jpg"));
             items.add(new Item("50740","White vinegar","5","SELECTION","2","https://product-images.metro.ca/images/he6/h09/8854725820446.jpg"));
             items.add(new Item("56200","Medium Ground Beef, Value Pack","6","None","2","https://product-images.metro.ca/images/h61/h5b/9188501585950.jpg"));
-            items.add(new Item("58181","Frozen chicken pot pie","7","ST-HUBERT","2","https://product-images.metro.ca/images/h3a/h0f/8821239021598.jpg"));
+            items.add(new Item("58181","Frozen chicken pot pie","7","ST-HUBERT","2","https://product-images.metro.ca/images/h3a/h0f/8821239021598.jpg"));*/
 
             source_brand_map.put("0","Loblaws");
             source_brand_map.put("1","Walmart");
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             category_map.put("Frozen","7");*/
 
 
-            InteractWithServer iws = new InteractWithServer();
+            /*InteractWithServer iws = new InteractWithServer();
             String content = iws.get_all();
             ids = getAllMatches(content,"\"item_id\": \"(.*?)\"");
             for(int x = 0;x<ids.size();x++){
@@ -194,14 +194,15 @@ public class MainActivity extends AppCompatActivity {
                 String temp=imgsrcs.get(x).replace("\"img_src\": \"", "");
                 imgsrcs.set(x,temp.substring(0, temp.length()-1) );
             }
-            items = new ArrayList<>();
+            //items = new ArrayList<>();
+            ggDB.onetime();
             for (int x = 0; x<ids.size();x++){
-                items.add(new Item(ids.get(x),names.get(x),categories.get(x),itembrands.get(x),sourcebrands.get(x),imgsrcs.get(x)));
-            }
+                //items.add(new Item(ids.get(x),names.get(x),categories.get(x),itembrands.get(x),sourcebrands.get(x),imgsrcs.get(x)));
+                ggDB.registerItem(ids.get(x),names.get(x),categories.get(x),itembrands.get(x),sourcebrands.get(x),imgsrcs.get(x));
+            }*/
             System.out.println("server test done");
-            for(int x =0; x<items.size(); x++){
-                System.out.println(items.get(x).toString());
-            }
+
+            System.out.println("all done initiallization");
         }
     }
     ArrayList<String> ids = new ArrayList<>();

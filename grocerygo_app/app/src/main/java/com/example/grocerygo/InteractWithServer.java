@@ -56,6 +56,7 @@ public class InteractWithServer {
                 }else {
                     if (bytesRead == -1) {
                         dataString += new String(buffer, 0, length_left+4);
+                        length_left = -4;
                     }else{
                         dataString += new String(buffer, 0, bytesRead);
                         length_left -= bytesRead;
@@ -94,10 +95,10 @@ public class InteractWithServer {
             System.out.println(protocol.length());
             System.out.println("Content: "+ content);
             System.out.println(content.length());
-            int last_img = content.indexOf("https://product-images.metro.ca/images/h09/h59/9185743667230.jpg");
+            int last_img = content.indexOf("https://product-images.metro.ca/images/h47/hcd/9199640674334.jpg");
             System.out.println(last_img);
             System.out.println(content.substring(last_img));
-            System.out.println(content.substring(10070));
+            System.out.println(content.substring(4243617));
 
             din.close();
             return content;

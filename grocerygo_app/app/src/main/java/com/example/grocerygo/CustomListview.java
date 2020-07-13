@@ -33,7 +33,6 @@ public class CustomListview extends ArrayAdapter<Item> implements Filterable {
     public ArrayList<Item> getItems() {
         return items;
     }
-
     ArrayList<Item> items;
     ArrayList<Item> forFilter;
     ArrayList<Item> originalItems;
