@@ -4,8 +4,9 @@ import selectors
 import traceback
 
 #import libserver  # for loblaws
+import libserver_forAndroid as libserver # testing android client
 #import walmart_libserver as libserver # for walmart
-import metro_libserver as libserver # for metro
+#import metro_libserver as libserver # for metro
 sel = selectors.DefaultSelector()
 
 
@@ -19,7 +20,7 @@ def accept_wrapper(sock):
 
 
 
-host='localhost'
+host='127.0.0.1'
 port = 65432
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Avoid bind() exception: OSError: [Errno 48] Address already in use

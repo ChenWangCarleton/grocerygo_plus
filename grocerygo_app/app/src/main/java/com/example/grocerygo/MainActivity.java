@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         button7.setOnClickListener(categoryButtonClickListener);
         button8 = (Button) findViewById(R.id.categoryButton8);
         button8.setOnClickListener(categoryButtonClickListener);
+
     }
     public ArrayList<Item> filterByCategory(String category){
         ArrayList<Item> result = new ArrayList<>();
@@ -159,6 +160,11 @@ public class MainActivity extends AppCompatActivity {
             for(int x =0; x<items.size(); x++){
                 System.out.println(items.get(x).toString());
             }
+
+
+            InteractWithServer iws = new InteractWithServer();
+            iws.get_all();
+            System.out.println("server test done");
         }
     }
 }

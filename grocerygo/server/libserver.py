@@ -67,6 +67,7 @@ class Message:
         else:
             if data:
                 self._recv_buffer += data
+                print("current data:",data)
             else:
                 raise RuntimeError("Peer closed.")
 
