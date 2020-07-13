@@ -24,7 +24,7 @@ hard_code = [[[] for j in range(8)] for i in range(3)]
 print(len(sample_data))
 print(len(sample_data[0]))
 
-max_data = 1
+max_data = 2
 
 for record in result:
     if record[2] in category_dict:
@@ -44,7 +44,7 @@ print(x)
 y = json.loads(x)
 print(y)
 #products.add(new Product(id.get(x),titles.get(x),body.get(x),vendor.get(x),types.get(x),created.get(x),handle.get(x),updated.get(x),at.get(x),suffix.get(x),scope.get(x),tags.get(x),imgURL.get(x)));
-print("ArrayList<Item>  items=new ArrayList<>();")
+"""print("ArrayList<Item>  items=new ArrayList<>();")
 for i in hard_code:
     for j in i:
         for k in j:
@@ -54,4 +54,4 @@ for i in hard_code:
 for key, value in source_brand_dict.items():
     print('source_brand_map.put("{}","{}")'.format(value, key))
 for key, value in category_dict.items():
-    print('category_map.put("{}","{}")'.format( value, key))
+    print('category_map.put("{}","{}")'.format( value, key))"""
