@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+  <h2>GroceryGo</h2>
+  <form class="search_bar">
+    <input type="text" placeholder="Search.." name="search">
+    <button type="submit">Submit</button>
+  </form>
+
+
+    <div id="myList">
+
+    </div>
+
+
+    <form class="pagination">
+      <button type="button">Last</button>
+      <input type="text" placeholder="Page number" name="page_number">
+      <button type="submit">Goto</button>
+      <button type="button" onclick="myFunction()">Next</button>
+    </form>
+
+    <script>
+      function myFunction() {
+        var list_view_element = document.createElement("DIV");
+        list_view_element.setAttribute("style", "background-color:#ddd;");
+        var hyper_link = document.createElement("A");
+        hyper_link.setAttribute("href","https://www.google.ca/");
+        var img_element = document.createElement("IMG");
+        img_element.setAttribute("src", "https://www.google.ca/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png");
+        img_element.setAttribute("width", "200");
+        img_element.setAttribute("height", "200");
+        img_element.setAttribute("alt", "template");
+        var text_field = document.createElement("PRE");
+        var item_name = document.createTextNode("Name");
+        var item_brand = document.createTextNode("Brand");
+        var item_price = document.createTextNode("Price");
+        text_field.appendChild(item_name);
+        text_field.appendChild(item_brand);
+        text_field.appendChild(item_price);
+        hyper_link.appendChild(img_element);
+        hyper_link.appendChild(text_field);
+        list_view_element.appendChild(hyper_link);
+        document.getElementById("myList").appendChild(list_view_element);
+      }
+      </script>
+</body>
+</html>
