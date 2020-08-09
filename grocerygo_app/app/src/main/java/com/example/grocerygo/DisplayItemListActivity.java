@@ -16,18 +16,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class DisplayItemListActivity extends AppCompatActivity {
-    String button_text;
-    ArrayList<Item> items;
-    boolean[] chip_selected = new boolean[4];
+    private String button_text;
+    private ArrayList<Item> items;
+    private boolean[] chip_selected = new boolean[4];
 
-    ListView list_view;
-    SearchView search_view;
-    ChipGroup filterGroup;
-    Chip all_chip;
-    Chip loblaws_chip;
-    Chip metro_chip;
-    Chip walmart_chip;
-    CustomListview customListview;
+    private ListView list_view;
+    private SearchView search_view;
+    private ChipGroup filterGroup;
+    private Chip all_chip;
+    private Chip loblaws_chip;
+    private Chip metro_chip;
+    private Chip walmart_chip;
+    private CustomListview customListview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){

@@ -55,3 +55,5 @@ for key, value in source_brand_dict.items():
     print('source_brand_map.put("{}","{}")'.format(value, key))
 for key, value in category_dict.items():
     print('category_map.put("{}","{}")'.format( value, key))"""
+with open("for_android.json","w") as f:
+    f.write(x)

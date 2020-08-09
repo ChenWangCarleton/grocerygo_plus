@@ -14,10 +14,10 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class my_cart extends AppCompatActivity {
-    ArrayList<Item> items;
+    private ArrayList<Item> items;
 
-    CustomListview customListview;
-    ListView list_view;
+    private CustomListview customListview;
+    private ListView list_view;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

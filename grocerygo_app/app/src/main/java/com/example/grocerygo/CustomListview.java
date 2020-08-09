@@ -28,14 +28,14 @@ import java.util.ArrayList;
 
 
 public class CustomListview extends ArrayAdapter<Item> implements Filterable {
-    Activity context;
+    private Activity context;
 
     public ArrayList<Item> getItems() {
         return items;
     }
-    ArrayList<Item> items;
-    ArrayList<Item> forFilter;
-    ArrayList<Item> originalItems;
+    private ArrayList<Item> items;
+    private ArrayList<Item> forFilter;
+    private ArrayList<Item> originalItems;
     private CustomeFilter customeFilter;
     private ChipGroupFilter chipGroupFilter;
 

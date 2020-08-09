@@ -9,52 +9,72 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 
 public class GroceryGoDatabase extends SQLiteOpenHelper{
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "GroceryGoDB";
 
-    private static final String TABLE_NAME = "GroceryGoShoppingList";
-    private static final String KEY_ID = "item_id";
+    private static final String SHOPPTINGLIST_TABLE_NAME = "GroceryGoShoppingList";
+    private static final String ITEM_TABLE_NAME = "GroceryGoItem";
+    private static final String APP_INFO_TABLE_NAME = "GroceryAppInfo";
 
-    private static final String KEY_QUENTITY = "quantity";
-    private static final String[] COLUMNS = { KEY_ID, KEY_QUENTITY};
+    private static GroceryGoDatabase mInstance = null;
 
-    private static final String ITEM_TABLE = "GroceryGoItem";
-    private static final String ggcart="GGCart";
+    private static final String CART_ITEM_TABLE_NAME="GGCart";
+    private String sv = "server_version";
+    private String ii = "item_id";
+    private String in = "item_name";
+    private String ic = "item_category";
+    private String ib = "item_brand";
+    private String sb = "source_brand";
+    private String is = "img_src";
+    private String quan = "quantity";
+    private String[] app_info_columns = {sv};
+    private String[] item_columns = {ii,in,ic,ib,sb,is};
+    private String[] cart_columns = {ii,in,ic,ib,sb,is,quan};
+    //https://stackoverflow.com/questions/18147354/sqlite-connection-leaked-although-everything-closed/18148718#18148718
+    public static GroceryGoDatabase getInstance(Context ctx) {
 
-    String ii = "item_id";
-    String in = "item_name";
-    String ic = "item_category";
-    String ib = "item_brand";
-    String sb = "source_brand";
-    String is = "img_src";
-    String quan = "quantity";
-    String[] columns = {ii,in,ic,ib,sb,is};
-    String[] cartcolumns = {ii,in,ic,ib,sb,is,quan};
-    public GroceryGoDatabase(Context context) {
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (mInstance == null) {
+            mInstance = new GroceryGoDatabase(ctx.getApplicationContext());
+        }
+        return mInstance;
+    }
+
+    private GroceryGoDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATION_TABLE = "CREATE TABLE GroceryGoShoppingList ( "
+        String CREATION_CART_TABLE = "CREATE TABLE " +SHOPPTINGLIST_TABLE_NAME + " ( "
                 + "item_id VARCHAR PRIMARY KEY, " + "quantity INTEGER)";
-
-        db.execSQL(CREATION_TABLE);
+        String CREATION_CART_ITEM_TABLE = "CREATE TABLE " + CART_ITEM_TABLE_NAME + " ( "
+                + "item_id VARCHAR PRIMARY KEY, " + "item_name VARCHAR, item_category VARCHAR, item_brand VARCHAR,  source_brand VARCHAR, img_src VARCHAR, quantity INTEGER)";
+        String CREATION_ITEM_TABLE = "CREATE TABLE "+ ITEM_TABLE_NAME +" ( "
+                + "item_id VARCHAR PRIMARY KEY, " + "item_name VARCHAR, item_category VARCHAR, item_brand VARCHAR,  source_brand VARCHAR, img_src VARCHAR)";
+        String CREATION_APP_INFO_TABLE = "CREATE TABLE "+ APP_INFO_TABLE_NAME +" ( "
+                + "server_version VARCHAR PRIMARY KEY) ";
+        db.execSQL(CREATION_CART_TABLE);
+        db.execSQL(CREATION_CART_ITEM_TABLE);
+        db.execSQL(CREATION_ITEM_TABLE);
+        db.execSQL(CREATION_APP_INFO_TABLE);
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // you can implement here migration process
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS "+SHOPPTINGLIST_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS "+CART_ITEM_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS "+ITEM_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS "+APP_INFO_TABLE_NAME);
+
         this.onCreate(db);
     }
-    public void onetime(){
-        //String CREATION_TABLE2 = "CREATE TABLE GroceryGoItem ( "
-        String CREATION_TABLE2 = "CREATE TABLE GGCart ( "
-                + "item_id VARCHAR PRIMARY KEY, " + "item_name VARCHAR, item_category VARCHAR, item_brand VARCHAR,  source_brand VARCHAR, img_src VARCHAR, quantity INTEGER)";
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL(CREATION_TABLE2);
-    }
+
+
+
     public void registerItem(String item_id, String item_name, String category, String item_brand, String source_brand, String img_src){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -65,10 +85,34 @@ public class GroceryGoDatabase extends SQLiteOpenHelper{
         values.put(sb, source_brand);
         values.put(is, img_src);
         // insert
-        db.insert(ITEM_TABLE,null, values);
-        db.close();
+        db.insertWithOnConflict(ITEM_TABLE_NAME,null, values,SQLiteDatabase.CONFLICT_IGNORE);
+        //db.close();
 
         //System.out.println("added to db: "+item.toString());
+    }
+    public void addServerversion(String Server_version){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(sv, Server_version);
+        db.insertWithOnConflict(APP_INFO_TABLE_NAME,null, values,SQLiteDatabase.CONFLICT_IGNORE);
+    }
+    public ArrayList<String> getServerVersions(){
+        ArrayList<String> server_versions = new ArrayList<String>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(APP_INFO_TABLE_NAME,app_info_columns,null,null,null,null,null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String server_version = cursor.getString(0);
+                server_versions.add(server_version);
+                System.out.println("server_version: "+server_version);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        //db.close();
+        return server_versions;
     }
     public void addItem(Item item, int quantity) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -79,10 +123,10 @@ public class GroceryGoDatabase extends SQLiteOpenHelper{
         values.put(ib, item.getItem_brand());
         values.put(sb, item.getSource_brand());
         values.put(is, item.getImg_src());
-        values.put(KEY_QUENTITY, quantity);
+        values.put(quan, quantity);
         // insert
-        db.insert(ggcart,null, values);
-        db.close();
+        db.insertWithOnConflict(CART_ITEM_TABLE_NAME,null, values,SQLiteDatabase.CONFLICT_IGNORE);
+        //db.close();
 
         System.out.println("added to db: "+item.toString());
     }
@@ -90,8 +134,8 @@ public class GroceryGoDatabase extends SQLiteOpenHelper{
         ArrayList<Item> result = new ArrayList<>();
         String selection = ic + " = ?";
         String[] selectionArgs = {category};
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.query(ITEM_TABLE,columns,selection,selectionArgs,null,null,null);
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(ITEM_TABLE_NAME,item_columns,selection,selectionArgs,null,null,null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -99,14 +143,17 @@ public class GroceryGoDatabase extends SQLiteOpenHelper{
 
             } while (cursor.moveToNext());
         }
+        cursor.close();
+        //https://stackoverflow.com/questions/23293572/android-cannot-perform-this-operation-because-the-connection-pool-has-been-clos/23293930?noredirect=1#23293930
+        //db.close();
         return result;
     }
     public ArrayList<Item> allItems() {
 
         ArrayList<Item> shoppingList = new ArrayList<Item>();
 
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.query(ggcart,cartcolumns,null,null,null,null,null);
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(CART_ITEM_TABLE_NAME,cart_columns,null,null,null,null,null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -115,7 +162,8 @@ public class GroceryGoDatabase extends SQLiteOpenHelper{
 
             } while (cursor.moveToNext());
         }
-
+        cursor.close();
+        //db.close();
         return shoppingList;
     }
 }

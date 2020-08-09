@@ -9,6 +9,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,21 +22,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
-    SearchView main_search_view;
-    Button button1;
-    Button button2;
-    Button button3;
-    Button button4;
-    Button button5;
-    Button button6;
-    Button button7;
-    Button button8;
-    ImageButton shoppingListButton;
+    private SearchView main_search_view;
+    private Button button1;
+    private Button button2;
+    private Button button3;
+    private Button button4;
+    private Button button5;
+    private Button button6;
+    private Button button7;
+    private Button button8;
+    private ImageButton shoppingListButton;
 
 
     //public static ArrayList<Item>  items=new ArrayList<>();
-    Map<String, String> source_brand_map = new HashMap<String, String>();
-    Map<String, String> category_map = new HashMap<String, String>();
+    private Map<String, String> source_brand_map = new HashMap<String, String>();
+    private Map<String, String> category_map = new HashMap<String, String>();
     public static GroceryGoDatabase ggDB;
     CategoryButtonClickListener categoryButtonClickListener = new CategoryButtonClickListener();
     @Override
@@ -41,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         new Initialization().start();// initialize
-        ggDB = new GroceryGoDatabase(this);
+        ggDB = GroceryGoDatabase.getInstance(this);
 
         main_search_view = (SearchView) findViewById(R.id.search_main);
         shoppingListButton = (ImageButton) findViewById(R.id.MyGroceryListButton);
@@ -98,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
     class Initialization extends Thread{
 
         public void run(){
+
             /*items.add(new Item("527","Organic Honeydew Melon","0","None","0","https://assets.shop.loblaws.ca/products_jpeg/20289708001/en/20289708001_lrg_1_@1x.jpg"));
             items.add(new Item("1430","Café blanc 3-en-1","1","None","0","https://assets.shop.loblaws.ca/products_jpeg/21094512/en/21094512_lrg_1_@1x.jpg"));
             items.add(new Item("6774","1/4 Rotisserie Chicken Dark Meat","2","None","0","https://assets.shop.loblaws.ca/products_jpeg/20116090/en/20116090_lrg_1_@1x.jpg"));
@@ -193,24 +199,97 @@ public class MainActivity extends AppCompatActivity {
             for(int x = 0;x<imgsrcs.size();x++){
                 String temp=imgsrcs.get(x).replace("\"img_src\": \"", "");
                 imgsrcs.set(x,temp.substring(0, temp.length()-1) );
-            }
-            //items = new ArrayList<>();
-            ggDB.onetime();
-            for (int x = 0; x<ids.size();x++){
-                //items.add(new Item(ids.get(x),names.get(x),categories.get(x),itembrands.get(x),sourcebrands.get(x),imgsrcs.get(x)));
-                ggDB.registerItem(ids.get(x),names.get(x),categories.get(x),itembrands.get(x),sourcebrands.get(x),imgsrcs.get(x));
             }*/
+            //items = new ArrayList<>();
+            //ggDB.onetime();
+            boolean initialized = false;
+            ArrayList<String> versions = ggDB.getServerVersions();
+            for(int x=0; x<versions.size();x++){
+                System.out.println("server version get from db: "+ versions.get(x));
+                if (versions.get(x).equals("test")){
+                    initialized = true;
+                }
+            }
+            if(!initialized){
+                System.out.println("initializing servers!");
+                load_data_from_resource_file();
+                ggDB.addServerversion("test");
+            }/*else{
+
+                System.out.println("deleting dbs");
+                ggDB.close();
+                deleteDB();
+            }*/
+
             System.out.println("server test done");
 
             System.out.println("all done initiallization");
         }
     }
-    ArrayList<String> ids = new ArrayList<>();
-    ArrayList<String> names = new ArrayList<>();
-    ArrayList<String> categories = new ArrayList<>();
-    ArrayList<String> itembrands = new ArrayList<>();
-    ArrayList<String> sourcebrands = new ArrayList<>();
-    ArrayList<String> imgsrcs = new ArrayList<>();
+    private void deleteDB(){
+        this.deleteDatabase("GroceryGoDB");
+    }
+    public void load_data_from_resource_file(){
+        String content = "";
+        InputStream inputStream = getResources().openRawResource(R.raw.initial_data);
+        BufferedReader bufferedReader= new BufferedReader(new InputStreamReader(inputStream));
+        String eachline = null;
+        try {
+            while ((eachline = bufferedReader.readLine()) != null){
+                content +=eachline;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+        if (content.equals("")){
+            System.out.println("retreive data from raw resources failed");
+            return;
+        }
+        System.out.println("raw resource loaded");
+        ArrayList<String> ids = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<String> categories = new ArrayList<>();
+        ArrayList<String> itembrands = new ArrayList<>();
+        ArrayList<String> sourcebrands = new ArrayList<>();
+        ArrayList<String> imgsrcs = new ArrayList<>();
+        ids = getAllMatches(content,"\"item_id\": \"(.*?)\"");
+        for(int x = 0;x<ids.size();x++){
+            String temp=ids.get(x).replace("\"item_id\": \"", "");
+            ids.set(x,temp.substring(0, temp.length()-1) );
+        }
+
+        names = getAllMatches(content,"\"item_name\": \"(.*?)\"");
+        for(int x = 0;x<names.size();x++){
+            String temp=names.get(x).replace("\"item_name\": \"", "");
+            names.set(x,temp.substring(0, temp.length()-1) );
+        }
+        categories = getAllMatches(content,"\"category\": \"(.*?)\"");
+        for(int x = 0;x<categories.size();x++){
+            String temp=categories.get(x).replace("\"category\": \"", "");
+            categories.set(x,temp.substring(0, temp.length()-1) );
+        }
+        itembrands = getAllMatches(content,"\"item_brand\": \"(.*?)\"");
+        for(int x = 0;x<itembrands.size();x++){
+            String temp=itembrands.get(x).replace("\"item_brand\": \"", "");
+            itembrands.set(x,temp.substring(0, temp.length()-1) );
+        }
+        sourcebrands = getAllMatches(content,"\"source_brand\": \"(.*?)\"");
+        for(int x = 0;x<sourcebrands.size();x++){
+            String temp=sourcebrands.get(x).replace("\"source_brand\": \"", "");
+            sourcebrands.set(x,temp.substring(0, temp.length()-1) );
+        }
+        imgsrcs = getAllMatches(content,"\"img_src\": \"(.*?)\"");
+        for(int x = 0;x<imgsrcs.size();x++) {
+            String temp = imgsrcs.get(x).replace("\"img_src\": \"", "");
+            imgsrcs.set(x, temp.substring(0, temp.length() - 1));
+        }
+        System.out.println("writing to db");
+        for (int x = 0; x<ids.size();x++){
+            //items.add(new Item(ids.get(x),names.get(x),categories.get(x),itembrands.get(x),sourcebrands.get(x),imgsrcs.get(x)));
+            ggDB.registerItem(ids.get(x),names.get(x),categories.get(x),itembrands.get(x),sourcebrands.get(x),imgsrcs.get(x));
+        }
+    }
     public  ArrayList<String> getAllMatches(String text, String regex) {
         ArrayList<String> matches = new ArrayList<String>();
         Matcher m = Pattern.compile("(?=(" + regex + "))").matcher(text);

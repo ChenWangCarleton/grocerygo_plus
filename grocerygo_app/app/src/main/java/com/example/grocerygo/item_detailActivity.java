@@ -17,11 +17,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class item_detailActivity extends AppCompatActivity {
-    Item item_obj;
-    TextView title;
-    TextView des;
-    ImageButton addButton;
-    ImageView img;
+    private Item item_obj;
+    private TextView title;
+    private TextView des;
+    private ImageButton addButton;
+    private ImageView img;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
