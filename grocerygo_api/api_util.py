@@ -24,7 +24,9 @@ class Item:
         self.item_ingredient = ingredient
 
         self.searchable_str = self.item_brand + self.item_name
-
+    def asdict_for_price(self):
+        return {"item_name": self.item_name,
+                "item_price": self.item_price}
     def asdict(self):
         return {"item_id": self.item_id, "item_name": self.item_name, "img_src": self.img_src,
                 "item_price": self.item_price, "item_category": self.item_category,
@@ -70,8 +72,20 @@ def generate_response_id(query):
             results.append(item.asdict())
 
     return results
+def generate_price_response_id(query):
+    global item_list
+    results = []
+    ids = query.split(',')
 
+    #print(ids)
 
+    for item in item_list:
+        if len(ids) == len(results):
+            break
+        if item.has_same_id(ids):
+            results.append(item.asdict_for_price())
+
+    return results
 def generate_response(query):
     result_first_half = '<html><body><h2>GroceryGo</h2><form class="search_bar"><input type="text" placeholder="Search.." name="search"><button type="submit">Submit</button></form><div id="myList">'
     result_second_half = '</div></body></html>'

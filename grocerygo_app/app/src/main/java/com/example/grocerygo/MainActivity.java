@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        new Initialization().start();// initialize
         ggDB = GroceryGoDatabase.getInstance(this);
+        new Initialization().start();// initialize
 
         main_search_view = (SearchView) findViewById(R.id.search_main);
         shoppingListButton = (ImageButton) findViewById(R.id.MyGroceryListButton);

@@ -26,6 +26,13 @@ def search_by_id():
     else:
         return send_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'index.html'))
 
+@app.route('/api/v1/price/byid', methods=['GET'])
+def search_price_by_id():
+    if 'id' in request.args:
+        query = request.args['id']
+        return jsonify(generate_price_response_id(query))
+    else:
+        return send_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'index.html'))
 
 
 app.run()
