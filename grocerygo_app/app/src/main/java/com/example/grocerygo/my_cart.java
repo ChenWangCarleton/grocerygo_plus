@@ -40,7 +40,7 @@ public class my_cart extends AppCompatActivity {
         items = new ArrayList<Item>();
         get_shopping_list_items();
 
-        String temp_url = "http://10.0.2.2:5000/api/v1/price/byid?id=";
+        String temp_url = "http://174.114.61.16:5000/api/v1/price/byid?id=";
         String ids = "";
         for(int x=0;x<items.size();x++){
             ids = ids + items.get(x).getItem_id()+",";
